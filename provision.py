@@ -36,7 +36,7 @@ randomvec = [random.randint(domain[i][0],domain[i][1])
 total_attr_strengths = []
 for a in range(0, len(resources[0]) - 1):
   total_attr_strengths.append(sum([r[a+1] for r in resources]))
-print 'total combined attr strength:', total_attr_strengths
+#print 'total combined attr strength:', total_attr_strengths
 
 #Ideal attribute strength at each consumer.
 #This is simple right now becuase we're just dividing total
@@ -44,7 +44,7 @@ print 'total combined attr strength:', total_attr_strengths
 optimal_attr_strengths = []
 for a in range(0, len(total_attr_strengths)):
   optimal_attr_strengths.append(total_attr_strengths[a]/len(consumers))
-print 'optimal strength at each consumer:', optimal_attr_strengths
+#print 'optimal strength at each consumer:', optimal_attr_strengths
 
 def provisioning_cost(vec):
   cost = 0
@@ -99,22 +99,23 @@ def print_solution(vec):
 
 
 def main():
-  
+
   if len(sys.argv) == 4:
     if sys.argv[3] == 'annealing':
-      s = optimization.annealingoptimize(domain, provisioning_cost)
+      cost, sol = optimization.annealingoptimize(domain, provisioning_cost)
     elif sys.argv[3] == 'hillclimb':
-      s = optimization.hillclimb(domain, provisioning_cost)
+      cost, sol = optimization.hillclimb(domain, provisioning_cost)
     elif sys.argv[3] == 'random':
-      s = optimization.randomoptimize(domain, provisioning_cost)
+      cost, sol = optimization.randomoptimize(domain, provisioning_cost)
     elif sys.argv[3] == 'genetic':
-      s = optimization.geneticoptimize(domain, provisioning_cost)
+      cost, sol = optimization.geneticoptimize(domain, provisioning_cost)
     else:
-      s = optimization.geneticoptimize(domain, provisioning_cost)
+      raise ValueError('Invalid algorithm')
   else:
-    s = optimization.geneticoptimize(domain, provisioning_cost)
+      raise ValueError('No algorithm selected')
 
-  print_solution(s)
+  print 'cost = ', cost, 'solution = ', sol
+  #print_solution(sol)
 
 if __name__ == "__main__":
     main()
