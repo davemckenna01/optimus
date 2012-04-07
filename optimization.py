@@ -4,7 +4,7 @@ import math
 def randomoptimize(domain, costf):
   best = 999999999
   bestr = None
-  for i in range(100000):
+  for i in range(1000):
     #Create a random solution
     r = [random.randint(domain[j][0], domain[j][1])
          for j in range(len(domain))]
@@ -17,7 +17,8 @@ def randomoptimize(domain, costf):
       best = cost
       bestr = r
 
-  return r
+  print "---------------------", best
+  return bestr
 
 def hillclimb(domain, costf):
   #Create a random solution
