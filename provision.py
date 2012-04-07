@@ -11,42 +11,42 @@ consumers = [
 for consumer in consumers:
   consumer.append([]);
 
-resources_labels = ['name', 'arrow', 'close combat']
+resources_labels = ['name', 'arrow', 'close combat', 'magic']
 resources = [
-  ['jonsnow',         8,    8],
-  ['samtarly',        1,		5],
-  ['dolorousedd',     5,		4],
-  ['eddisontollett',  5,		3],
-  ['cotterpyke',      6,		6],
-  ['clydas',          2,		4],
-  ['bowenmarsh',      4,		1],
-  ['hobb',            3,		7],
-  ['donalnoye',       6,		0],
-  ['owen',            3,		3],
-  ['yarwick',         2,		5],
-  ['cellador',        4,		3],
-  ['jackbulwer',      3,		2],
-  ['emmett',          5,		7],
-  ['denys',           5,		4],
-  ['wallace',         6,		2],
-  ['mullin',          3,		1],
-  ['halfhand',        9,		9],
-  ['stonesnake',      7,		8],
-  ['harmune',         2,		5],
-  ['tattersalt',      2,		5],
-  ['glendon',         4,		6],
-  ['hewett',          6,		1],
-  ['maynard',         2,		1],
-  ['barleycorn',      2,		5],
-  ['robb',            9,		9],
-  ['bran',            2,		7],
-  ['rickon',          2,		2],
-  ['barristan',      10,	 10],
-  ['lordmormont',     7,		8],
-  ['arya',            4,		6],
-  ['brienne',         9,		9],
-  ['tyrion',          4,		8],
-  ['ned',            10,   10]
+  ['jonsnow',         8,    8, 5],
+  ['samtarly',        1,		5,5],
+  ['dolorousedd',     5,		4,4],
+  ['eddisontollett',  5,		3,2],
+  ['cotterpyke',      6,		6,1],
+  ['clydas',          2,		4,5],
+  ['bowenmarsh',      4,		1,2],
+  ['hobb',            3,		7,3],
+  ['donalnoye',       6,		0,5],
+  ['owen',            3,		3,9],
+  ['yarwick',         2,		5,2],
+  ['cellador',        4,		3,1],
+  ['jackbulwer',      3,		2,8],
+  ['emmett',          5,		7,6],
+  ['denys',           5,		4,5],
+  ['wallace',         6,		2,9],
+  ['mullin',          3,		1,4],
+  ['halfhand',        9,		9,4],
+  ['stonesnake',      7,		8,4],
+  ['harmune',         2,		5,6],
+  ['tattersalt',      2,		5,4],
+  ['glendon',         4,		6,3],
+  ['hewett',          6,		1,1],
+  ['maynard',         2,		1,3],
+  ['barleycorn',      2,		5,3],
+  ['robb',            9,		9,7],
+  ['bran',            2,		7,2],
+  ['rickon',          2,		2,8],
+  ['barristan',      10,	 10,2],
+  ['lordmormont',     7,		8,1],
+  ['arya',            4,		6,4],
+  ['brienne',         9,		9,5],
+  ['tyrion',          4,		8,6],
+  ['ned',            10,   10,4]
 ]
 
 #What a solution looks like:
@@ -68,6 +68,7 @@ randomvec = [random.randint(domain[i][0],domain[i][1])
 total_attr_strengths = []
 for a in range(0, len(resources[0]) - 1):
   total_attr_strengths.append(sum([r[a+1] for r in resources]))
+print 'total combined attr strength:', total_attr_strengths
 
 #Ideal attribute strength at each consumer.
 #This is simple right now becuase we're just dividing total
@@ -75,6 +76,7 @@ for a in range(0, len(resources[0]) - 1):
 optimal_attr_strengths = []
 for a in range(0, len(total_attr_strengths)):
   optimal_attr_strengths.append(total_attr_strengths[a]/len(consumers))
+print 'optimal strength at each consumer:', optimal_attr_strengths
 
 def provisioning_cost(vec):
   cost = 0
