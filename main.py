@@ -21,11 +21,6 @@ Run algorithm on file
 - run: /files/{id}/run/{algo}     POST
 """
 
-class Files(db.Model):
-  blobKey = blobstore.BlobReferenceProperty()
-
-
-
 class MainHandler(webapp.RequestHandler):
     def get(self):
         upload_url = blobstore.create_upload_url('/upload')
@@ -34,23 +29,16 @@ class MainHandler(webapp.RequestHandler):
         self.response.out.write("""Upload File: <input type="file" name="file"><br> <input type="submit"
             name="submit" value="Submit"> </form></body></html>""")
 
-class FileHandler(blobstore_handlers.BlobstoreUploadHandler):
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
   def post(self):
     upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
     blob_info = upload_files[0]
-    logging.info(blob_info.key())
     
-    afile = Files(blobKey = blob_info.key())
+    afile = Files(blobRef = blob_info.key(), name = blob_info.filename)
     afile.put()
 
-
-    self.redirect('/serve/%s' % blob_info.key())
+    self.redirect('/files')
   
-  def get(self):
-    blobstore.GetKeys()
-    #blob_reader = blobstore.BlobReader(blob_key)
-    #list all files
-    pass
 
 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -60,9 +48,24 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
     self.send_blob(blob_info)
 
 
+class FileHandler(webapp.RequestHandler):
+  def get(self):
+    all_files = blobstore.BlobInfo.all()
+
+    #blob_reader = blobstore.BlobReader(blob_key)
+
+    res = ''
+    for f in all_files:
+      res += '<a href="/serve/%s">%s</a><br/>' % (f.key(), f.filename)
+
+    self.response.out.write(res)
+
+
+
 app = webapp2.WSGIApplication([('/', MainHandler),
-                               ('/upload', FileHandler),
+                               ('/upload', UploadHandler),
                                ('/serve/([^/]+)?', ServeHandler),
+                               ('/files', FileHandler),
                               ], debug=True)
 
 
