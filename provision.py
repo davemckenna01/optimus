@@ -114,7 +114,9 @@ def main():
   else:
       raise ValueError('No algorithm selected')
 
-  print 'cost = ', cost, 'solution = ', sol
+  result = {'cost': cost, 'solution': sol}
+  print result
+
   #print_solution(sol)
 
 if __name__ == "__main__":
