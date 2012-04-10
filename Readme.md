@@ -16,10 +16,10 @@ Optimus uses smart optimization algorithms to come to a "pretty good" solution, 
 
 ## Algorithms
 
-[Genetic](http://en.wikipedia.org/wiki/Genetic_algorithm)
-[Simulated Annealing](http://en.wikipedia.org/wiki/Simulated_annealing)
-[Hill Climbing](http://en.wikipedia.org/wiki/Hill_climbing)
-[Random](http://en.wikipedia.org/wiki/Random_optimization)
+- [Genetic](http://en.wikipedia.org/wiki/Genetic_algorithm)
+- [Simulated Annealing](http://en.wikipedia.org/wiki/Simulated_annealing)
+- [Hill Climbing](http://en.wikipedia.org/wiki/Hill_climbing)
+- [Random](http://en.wikipedia.org/wiki/Random_optimization)
 
 ## Try it out
 [optimusapp.appspot.com](http://optimusapp.appspot.com)
