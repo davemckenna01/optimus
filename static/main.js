@@ -1,3 +1,5 @@
+window.gfiles;
+
 $(function(){
 
   var ResourceFile = Backbone.Model.extend({
@@ -19,5 +21,7 @@ $(function(){
   //note: this is bad, should bootstrap on page load
   files.fetch();
 
+  gfiles = files;
 
 });
+

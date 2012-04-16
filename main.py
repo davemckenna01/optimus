@@ -22,7 +22,13 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
   def get(self, resource):
     resource = str(urllib.unquote(resource))
     blob_info = blobstore.BlobInfo.get(resource)
-    self.send_blob(blob_info)
+
+    self.response.out.write(json.dumps({
+      'blobKey': str(blob_info.key()), 
+      'name': blob_info.filename,
+      'content': blob_info.open().readlines()
+    }))
+    #self.send_blob(blob_info)
 
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
   def post(self):
