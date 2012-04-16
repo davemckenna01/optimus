@@ -21,6 +21,12 @@ $(function(){
   //note: this is bad, should bootstrap on page load
   files.fetch();
 
+  //use files.at(5).fetch() to get content
+
+  
+
+
+
   gfiles = files;
 
 });

@@ -9,14 +9,34 @@ import csv
 
 from google.appengine.ext import blobstore
 from google.appengine.ext import webapp
+from google.appengine.ext import db
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp import template
 
+#Models
+
+class Solution(db.Model):
+  blob_info = blobstore.BlobReferenceProperty()
+  consumers = db.ListProperty(str,required=True)
+  algorithm = db.StringProperty(required=True, choices=set(['random','hillclimb','genetic','annealing']))
+  vector = db.ListProperty(int,required=True)
+  cost = db.IntegerProperty(required=True)
+
+
+#URL Handlers
 
 class MainHandler(webapp.RequestHandler):
   def get(self):
     path = os.path.join(os.path.dirname(__file__), 'templates/main.html')
     self.response.out.write(template.render(path, {'upload_url': '/resources'}))
+
+
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    upload_files = self.get_uploads('file')
+    blob_info = upload_files[0]
+    self.response.out.write(json.dumps({'blobKey': str(blob_info.key()), 'name': blob_info.filename}))
+
 
 class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
   def get(self, resource):
@@ -30,11 +50,6 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
     }))
     #self.send_blob(blob_info)
 
-class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-  def post(self):
-    upload_files = self.get_uploads('file')
-    blob_info = upload_files[0]
-    self.response.out.write(json.dumps({'blobKey': str(blob_info.key()), 'name': blob_info.filename}))
 
 class ResourceHandler(blobstore_handlers.BlobstoreUploadHandler):
   def post(self):
@@ -52,15 +67,28 @@ class ResourceHandler(blobstore_handlers.BlobstoreUploadHandler):
       j.append({'name':f.filename, 'blobKey': blob_key})
     self.response.out.write(json.dumps(j))
 
+
 class SolutionDetailHandler(webapp.RequestHandler):
-    def get(self):
-      pass
+  def get(self, blob_key, sol_key):
+    sol = Solution.get(sol_key)
+    j = {'cost':sol.cost,
+         'vector':sol.vector,
+         'consumers':sol.consumers,
+         'algorithm':sol.algorithm,
+         'blobKey':str(sol.blob_info.key()),
+         'solKey':str(sol.key())
+    }
+
+    self.response.out.write(json.dumps(j))
+
 
 class SolutionHandler(webapp.RequestHandler):
   def post(self, blob_key):
 
     consumers = self.request.get('consumers')
     algorithm = self.request.get('algorithm')
+
+    blob_info = blobstore.BlobInfo.get(blob_key)
 
     blob_reader = blobstore.BlobReader(blob_key)
 
@@ -73,7 +101,38 @@ class SolutionHandler(webapp.RequestHandler):
 
     cost, sol_vec = prov.optimize()
 
-    j = {'cost':cost,'solution':sol_vec}
+    sol = Solution(
+      blob_info = blob_info.key(),
+      consumers = consumers.split(','),
+      algorithm = algorithm,
+      vector = sol_vec,
+      cost = cost
+    )
+    sol.put()
+
+    j = {'cost':sol.cost,
+         'vector':sol.vector,
+         'consumers':sol.consumers,
+         'algorithm':sol.algorithm,
+         'blobKey':str(sol.blob_info.key()),
+         'solKey':str(sol.key())
+    }
+    self.response.out.write(json.dumps(j))
+
+  def get(self, blob_key):
+
+    blob_info = blobstore.BlobInfo.get(blob_key)
+
+    sols = Solution.all().filter('blob_info = ', blob_info.key())
+    j = []
+    for sol in sols:
+      j.append({'cost':sol.cost,
+           'vector':sol.vector,
+           'consumers':sol.consumers,
+           'algorithm':sol.algorithm,
+           'blobKey':str(sol.blob_info.key()),
+           'solKey':str(sol.key())
+      })
 
     self.response.out.write(json.dumps(j))
 
