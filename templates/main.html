@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>
+  <title>Optimus</title>
+  <script src="/static/jquery.min.js"></script>
+  <script src="/static/underscore.js"></script>
+  <script src="/static/backbone.js"></script>
+  <script src="/static/main.js"></script>
+</head>
+<body>
+  <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+  Upload File:
+  <input type="file" name="file"><br> 
+  <input type="submit" name="submit" value="Submit">
+</form>
+</body>
+</html>

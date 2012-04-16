@@ -10,21 +10,19 @@ import csv
 from google.appengine.ext import blobstore
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext.webapp import template
 
 
 class MainHandler(webapp.RequestHandler):
   def get(self):
     upload_url = blobstore.create_upload_url('/files')
-    self.response.out.write('<html><body>')
-    self.response.out.write('<form action="%s" method="POST" enctype="multipart/form-data">' % upload_url)
-    self.response.out.write("""Upload File: <input type="file" name="file"><br> <input type="submit"
-                            name="submit" value="Submit"> </form></body></html>""")
+    path = os.path.join(os.path.dirname(__file__), 'templates/main.html')
+    self.response.out.write(template.render(path, {'upload_url': upload_url}))
 
-
-class GetUploadURLHandler(webapp.RequestHandler):
+class UploadURLHandler(webapp.RequestHandler):
   def get(self):
     upload_url = blobstore.create_upload_url('/files')
-    self.response.out.write(json.dumps({'data':[{'uploadUrl': upload_url}]}))
+    self.response.out.write(json.dumps({'uploadUrl': upload_url}))
 
 
 class FileDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -45,22 +43,19 @@ class FileHandler(blobstore_handlers.BlobstoreUploadHandler):
     else:
       self.redirect('/files')
 
-  def get(self, mime):
+  def get(self):
     all_files = blobstore.BlobInfo.all()
 
-    j = {'data':[]}
+    j = []
     for f in all_files:
-      url = '/files/%s' % f.key()
-      j['data'].append({'name':f.filename, 'url': url})
+      blob_key = str(f.key())
+      j.append({'name':f.filename, 'blobKey': blob_key})
 
-    if mime == '.json':
-      self.response.out.write(json.dumps(j))
-    else:
-      self.response.out.write('<html><body><strong>' + json.dumps(j) + '</strong></body></html>')
+    self.response.out.write(json.dumps(j))
 
 
 class FileOptimizeHandler(webapp.RequestHandler):
-  def get(self, blob_key, consumers, algorithm, mime):
+  def get(self, blob_key, consumers, algorithm):
 
     blob_reader = blobstore.BlobReader(blob_key)
 
@@ -75,22 +70,19 @@ class FileOptimizeHandler(webapp.RequestHandler):
 
     j = {'cost':cost,'solution':sol_vec}
 
-    if mime == '.json':
-      self.response.out.write(json.dumps(j))
-    else:
-      self.response.out.write('<html><body><strong>' + json.dumps(j) + '</strong></body></html>')
+    self.response.out.write(json.dumps(j))
 
 
 
 app = webapp.WSGIApplication([('/main', MainHandler),
-                               ('/getUploadUrl', GetUploadURLHandler),
+                               ('/uploadUrl', UploadURLHandler),
                                #I'm not crazy about this regex: (.+?)(\.[^.]*$|$)
                                #that I'm using to pick out "file extensions" i.e. <resource>.json
                                #or w/e. B/c this forces me to raise 404s on invalid "file extensions"
                                #in the handler rather than by url matching... it's ok for now though
-                               ('/files/(.+?)/run/(.+?)/(.+?)(\.[^.]*$|$)', FileOptimizeHandler),
+                               ('/files/(.+?)/run/(.+?)/(.+?)', FileOptimizeHandler),
                                ('/files/(.+?)', FileDetailHandler),
-                               ('/files(\.[^.]*$|$)', FileHandler),
+                               ('/files', FileHandler),
                               ], debug=True)
 
 
