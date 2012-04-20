@@ -15,6 +15,11 @@ from google.appengine.ext.webapp import template
 
 #Models
 
+class FileMeta(db.Model):
+  blob_info = blobstore.BlobReferenceProperty()
+  name = db.StringProperty(required=True)
+  description = db.StringProperty()
+
 class Solution(db.Model):
   blob_info = blobstore.BlobReferenceProperty()
   consumers = db.ListProperty(str,required=True)
@@ -35,7 +40,26 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
   def post(self):
     upload_files = self.get_uploads('file')
     blob_info = upload_files[0]
-    self.response.out.write(json.dumps({'blobKey': str(blob_info.key()), 'name': blob_info.filename}))
+
+    fname = blob_info.filename
+    custom = self.request.get('customFilename')
+    if (custom):
+      fname = custom
+
+    description = self.request.get('description')
+
+    file_meta = FileMeta(
+        blob_info = blob_info.key(),
+        name = fname,
+        description = description
+    )
+    file_meta.put()
+
+    self.response.out.write(json.dumps({
+      'blobKey': str(file_meta.blob_info.key()),
+      'name': file_meta.name,
+      'description': file_meta.description
+    }))
 
 
 class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -43,23 +67,33 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
     resource = str(urllib.unquote(resource))
     blob_info = blobstore.BlobInfo.get(resource)
 
+    file_meta = FileMeta.all().filter('blob_info = ', blob_info.key()).get()
+
     payload = json.loads(self.request.body)
-    
-    logging.info(payload['name'])
 
+    name = payload['name']
+    description = payload['description']
 
-    #self.response.out.write(json.dumps({
-    #  'blobKey': str(blob_info.key()), 
-    #  'name': blob_info.filename
-    #}))
+    if name != file_meta.name or description != file_meta.description:
+      file_meta.name = name
+      file_meta.description = description
+      file_meta.put()
+      self.response.set_status('200')
+    else:
+      #Another code?
+      self.response.set_status('200')
+
 
   def get(self, resource):
     resource = str(urllib.unquote(resource))
     blob_info = blobstore.BlobInfo.get(resource)
 
+    file_meta = FileMeta.all().filter('blob_info = ', blob_info.key()).get()
+
     self.response.out.write(json.dumps({
-      'blobKey': str(blob_info.key()), 
-      'name': blob_info.filename,
+      'blobKey': str(file_meta.blob_info.key()),
+      'name': file_meta.name,
+      'description': file_meta.description,
       'content': blob_info.open().readlines()
     }))
     #self.send_blob(blob_info)
@@ -74,11 +108,11 @@ class ResourceHandler(blobstore_handlers.BlobstoreUploadHandler):
     self.response.headers.add_header('Location', upload_url)
 
   def get(self):
-    all_files = blobstore.BlobInfo.all()
+    all_files = FileMeta.all()
     j = []
     for f in all_files:
-      blob_key = str(f.key())
-      j.append({'name':f.filename, 'blobKey': blob_key})
+      blob_key = str(f.blob_info.key())
+      j.append({'name':f.name, 'blobKey': blob_key, 'description': f.description})
     self.response.out.write(json.dumps(j))
 
 

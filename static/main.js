@@ -8,6 +8,7 @@ $(function(){
     defaults: {
       blobKey: '',
       name: '',
+      description: '',
       content: ''
     },
     idAttribute: 'blobKey'
@@ -30,9 +31,8 @@ $(function(){
     // The DOM events specific to an item.
     events: {
       'dblclick .fileName' : 'edit',
-    //  "click span.todo-destroy"   : "clear",
-      'keypress .resourceFile-input'      : 'updateOnEnter',
-      'blur .resourceFile-input'          : 'close'
+    //  "click .fileDestroy"   : "clear",
+      'click .close'          : 'close'
     },
 
     initialize: function() {
@@ -44,26 +44,22 @@ $(function(){
     render: function() {
       //this.$el.html(this.template(tpls.resourceList, {'list': this.model.models})).attr('id',this.id);
       $(this.el).html(this.template(this.model.toJSON()));
-      this.input = this.$('.resourceFile-input');
+      this.updateName = this.$('.updateName');
+      this.updateDescription = this.$('.updateDescription');
       return this;
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.
     edit: function() {
-      console.log(this.el);
       $(this.el).addClass("editing");
-      this.input.focus();
+      this.updateName.focus();
     },
 
     // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
-      this.model.save({name: this.input.val()});
+      this.model.save({name: this.updateName.val(), 
+                       description: this.updateDescription.val()});
       $(this.el).removeClass("editing");
-    },
-
-    // If you hit `enter`, we're through editing the item.
-    updateOnEnter: function(e) {
-      if (e.keyCode == 13) this.close();
     },
 
     // Remove the item, destroy the model.
