@@ -3,9 +3,139 @@ window.gsols;
 window.afile;
 
 $(function(){
-  var tpls = {
-    'list': '<ul><% _.each(list, function(item) { %><li><%=item%></li><% }) %></ul>'
-  }
+
+  var ResourceFile = Backbone.Model.extend({
+    defaults: {
+      blobKey: '',
+      name: '',
+      content: ''
+    },
+    idAttribute: 'blobKey'
+  });
+
+  var ResourceFileList = Backbone.Collection.extend({
+    url: '/resources',
+    model: ResourceFile
+  });
+
+  var resourceFiles  = new ResourceFileList();
+
+  //view for an individual resource item
+  var ResourceFileView = Backbone.View.extend({
+
+    tagName: 'li',
+
+    template: _.template($('#resource-template').html()),
+
+    // The DOM events specific to an item.
+    events: {
+      'dblclick .fileName' : 'edit',
+    //  "click span.todo-destroy"   : "clear",
+      'keypress .resourceFile-input'      : 'updateOnEnter',
+      'blur .resourceFile-input'          : 'close'
+    },
+
+    initialize: function() {
+      _.bindAll(this, 'render', 'close', 'remove');
+      this.model.bind('change', this.render);
+      this.model.bind('destroy', this.remove);
+    },
+
+    render: function() {
+      //this.$el.html(this.template(tpls.resourceList, {'list': this.model.models})).attr('id',this.id);
+      $(this.el).html(this.template(this.model.toJSON()));
+      this.input = this.$('.resourceFile-input');
+      return this;
+    },
+
+    // Switch this view into `"editing"` mode, displaying the input field.
+    edit: function() {
+      console.log(this.el);
+      $(this.el).addClass("editing");
+      this.input.focus();
+    },
+
+    // Close the `"editing"` mode, saving changes to the todo.
+    close: function() {
+      this.model.save({name: this.input.val()});
+      $(this.el).removeClass("editing");
+    },
+
+    // If you hit `enter`, we're through editing the item.
+    updateOnEnter: function(e) {
+      if (e.keyCode == 13) this.close();
+    },
+
+    // Remove the item, destroy the model.
+    clear: function() {
+      this.model.clear();
+    }
+  });
+
+  //var resourceItem = new ResourceItem({
+  //  model: ResourceFile
+  //  //id: ''
+  //});
+
+
+  var ResourceFilesView = Backbone.View.extend({
+    el: $('#resourceFiles'),
+    ////resourceFilesTemplate
+
+    initialize: function() {
+      _.bindAll(this, 'addOne', 'addAll', 'render');
+
+      resourceFiles.bind('add',     this.addOne);
+      resourceFiles.bind('reset',   this.addAll);
+      resourceFiles.bind('all',     this.render);
+
+      resourceFiles.fetch();
+    },
+
+    render: function() {
+    },
+
+    // Add a single resource file item to the list by creating a view for it, and
+    // appending its element to the `<ul>`.
+    addOne: function(resourceFile) {
+      var view = new ResourceFileView({model: resourceFile});
+      this.$("#files-list").append(view.render().el);
+    },
+
+    // Add all items in the **Todos** collection at once.
+    addAll: function() {
+      resourceFiles.each(this.addOne);
+    },
+  });
+
+  var resourceFilesView = new ResourceFilesView();
+
+  //make a global to access in the console
+  gfiles = resourceFiles;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   var Solution = Backbone.Model.extend({
     defaults: {
@@ -25,70 +155,5 @@ $(function(){
     },
     model: Solution
   });
-
-  var ResourceFile = Backbone.Model.extend({
-    defaults: {
-      blobKey: '',
-      name: '',
-      content: ''
-    },
-    idAttribute: 'blobKey'
-  });
-
-  var ResourceFiles = Backbone.Collection.extend({
-    url: '/resources',
-    model: ResourceFile
-  });
-
-  var files = new ResourceFiles();
-
-  files.on('reset', function(model, resp){
-    var afile = files.at(3);
-    var sols = new Solutions();
-    sols.blobKey = afile.get('blobKey');
-    sols.fetch();
-    sols.on('reset', function(model, resp){
-
-      gafile = afile;
-      gsols = sols;
-
-      var DocumentRow = Backbone.View.extend({
-
-        template: _.template,
-
-        tagName: "div",
-
-        className: "document-row",
-
-        //events: {
-        //  "click .icon":          "open",
-        //  "click .button.edit":   "openEditDialog",
-        //  "click .button.delete": "destroy"
-        //},
-
-        render: function() {
-          //$(this.el).html(this.template(frag, this.model.toJSON()));
-          $(this.el).html(this.template(tpls.list, {'list': this.model.get('vector')}));
-          $('body').append(this.el);
-          return this;
-        }
-      });
-
-      var docrow = new DocumentRow({
-        model: sols.at(2),
-        id: "solution-" + sols.at(2).id
-      });
-
-      docrow.render();
-    });
-
-
-  });
-
-  //note: this is bad, should bootstrap on page load
-  files.fetch();
-
-  gfiles = files;
-
 });
 

@@ -2,16 +2,65 @@
 <html>
 <head>
   <title>Optimus</title>
+  <style>
+    .page {border:1px solid red;}
+    .btn {background-color:pink;}
+
+    #files-list li.editing {
+    }
+    #files-list .editing .display,
+    #files-list .edit {
+      display: none;
+    }
+    #files-list .editing .edit {
+      display: block;
+    }
+    #files-list .editing input {
+    }
+  </style>
   <script src="/static/jquery.min.js"></script>
   <script src="/static/underscore.js"></script>
   <script src="/static/backbone.js"></script>
   <script src="/static/main.js"></script>
 </head>
 <body>
-  <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-  Upload File:
-  <input type="file" name="file"><br> 
-  <input type="submit" name="submit" value="Submit">
-</form>
+
+<section id="resourceFiles" class="page">
+  <header>
+    <hgroup>
+      <h1>Resources</h1>
+      <h2>View and upload resources</h2>
+    </hgroup>
+  </header>
+  <div>
+    <div class="add">
+      <input type="file">
+      <span class="btn">
+        Upload
+      </span>
+    </div>
+    <ul id="files-list">
+    </ul>
+    <div class="panel">
+    </div>
+  </div>
+</section>
+
+<!-- Templates -->
+
+<script type="text/template" id="resource-template">
+  <div class="resourceFile">
+    <div class="display">
+      <span class="fileName"><%=name%></span>
+      <span><%=blobKey%></span>
+      <span class="resourceFile-destroy">destroy</span>
+    </div>
+    <div class="edit">
+      <input class="resourceFile-input" type="text" value="<%= name %>" />
+      <span><%=blobKey%></span>
+    </div>
+  </div>
+</script>
+
 </body>
 </html>

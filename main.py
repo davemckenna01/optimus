@@ -39,6 +39,9 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
 
 class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
+  def put(self, resource):
+    print "wow"
+
   def get(self, resource):
     resource = str(urllib.unquote(resource))
     blob_info = blobstore.BlobInfo.get(resource)
