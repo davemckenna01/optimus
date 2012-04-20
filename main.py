@@ -40,7 +40,18 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 
 class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
   def put(self, resource):
-    print "wow"
+    resource = str(urllib.unquote(resource))
+    blob_info = blobstore.BlobInfo.get(resource)
+
+    payload = json.loads(self.request.body)
+    
+    logging.info(payload['name'])
+
+
+    #self.response.out.write(json.dumps({
+    #  'blobKey': str(blob_info.key()), 
+    #  'name': blob_info.filename
+    #}))
 
   def get(self, resource):
     resource = str(urllib.unquote(resource))
