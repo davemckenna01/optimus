@@ -17,6 +17,12 @@
     }
     #files-list .editing input {
     }
+    .optimize {
+      display:none;
+    }
+    .solutions-list {
+      display:none;
+    }
   </style>
   <script src="/static/jquery.min.js"></script>
   <script src="/static/underscore.js"></script>
@@ -24,36 +30,38 @@
   <script src="/static/main.js"></script>
 </head>
 <body>
-<form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-  <label for="file">Upload a file</label>
-  <input type="file" name="file"><br> 
-  <label for="customFilename">Custom Filename?</label>
-  <input type="text" name="customFilename" value=""><br> 
-  <label for="description">Description</label>
-  <input type="text" name="description" value=""><br> 
-  <input type="submit" name="submit" value="Submit">
-</form>
+
+
+<div id="app">
 
 <section id="resourceFiles" class="page">
+
   <header>
     <hgroup>
       <h1>Resources</h1>
       <h2>View and upload resources</h2>
     </hgroup>
   </header>
+
   <div>
-    <div class="add">
-      <input type="file">
-      <span class="btn">
-        Upload
-      </span>
-    </div>
+    <form action="/resources" method="POST" enctype="multipart/form-data">
+      <label for="file">Upload a file</label>
+      <input type="file" name="file"><br> 
+      <label for="customFilename">Custom Filename?</label>
+      <input type="text" name="customFilename" value=""><br> 
+      <label for="description">Description</label>
+      <input type="text" name="description" value=""><br> 
+      <input type="submit" name="submit" value="Submit">
+    </form>
+
     <ul id="files-list">
     </ul>
-    <div class="panel">
-    </div>
+
   </div>
+
 </section>
+
+</div>
 
 <!-- Templates -->
 
@@ -62,22 +70,51 @@
     <div class="display">
       <span>File Name: </span>
       <span class="fileName"><%=name%></span>
+      <br />
       <span>Description: </span>
       <span class="fileDescription"><%=description%></span>
-
-      <span class="fileKey"><%=blobKey%></span>
-
-      <span class="fileDestroy">destroy</span>
     </div>
     <div class="edit">
       <label for="updateName">File Name: </label>
       <input class="updateName" name="updateName" type="text" value="<%= name %>" />
+      <br />
       <label for="updateDescription">Description: </label>
       <input class="updateDescription" name="updateDescription" type="text" value="<%= description %>" />
-      <span><%=blobKey%></span>
+      <br />
       <span class="close">Done</span>
+      <br />
+      <span class="fileDestroy">destroy</span>
     </div>
+
+    <span class="btn optBtn">Optimize</span>
+    <br/>
+    <span class="btn viewSolBtn">View Solutions</span>
+
+    <!-- This is unforgivable repetition, FIX! -->
+    <div class="optimize">
+      <select name="algorithm">
+        <option value="genetic">Genetic</option>
+        <option value="anneal">Simulated Annealing</option>
+        <option value="hillclimb">Hill Climbing</option>
+        <option value="random">Random</option>
+      </select>
+      <br/>
+      <label for="consumers">Distrubute among:</label>
+      <input type="text" name="consumers" placeholder="comma, seperated, list" />
+      <br />
+      <span class="btn">GO!</span>
+    </div>
+
+    <ul class="solutions-list">
+      foo
+    </ul>
+
   </div>
+</script>
+
+<script type="text/template" id="solution-template">
+  <div>dave is cool</div>
+
 </script>
 
 </body>
