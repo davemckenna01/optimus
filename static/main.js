@@ -37,6 +37,12 @@ $(function(){
     clear: function() {
       this.destroy();
     },
+
+    //override Model.fetch()
+    fetch: function(opts){
+      this.fetched = true;
+      Backbone.Model.prototype.fetch.call(this, opts);
+    }
   });
 
   var ResourceFileList = Backbone.Collection.extend({
@@ -54,16 +60,17 @@ $(function(){
 
     // The DOM events specific to an item.
     events: {
-      'dblclick .fileName'    : 'edit',
-      'click    .fileDestroy' : 'clear',
-      'click    .close'       : 'close',
-      'click    .optBtn'      : 'toggleOpt',
-      'click    .viewSolBtn'  : 'toggleSol',
-      'click    .optimize .btn'  : 'optimize'
+      'dblclick .fileName'     : 'edit',
+      'click    .fileDestroy'  : 'clear',
+      'click    .close'        : 'close',
+      'click    .optBtn'       : 'toggleOpt',
+      'click    .viewSolBtn'   : 'toggleSol',
+      'click    .optimize .btn': 'optimize',
+      'click    .viewFile'     : 'fetchFileContent',
     },
 
     initialize: function() {
-      _.bindAll(this, 'render', 'close', 'remove');
+      _.bindAll(this, 'render', 'close', 'remove', 'showFile');
       this.model.bind('change', this.render);
       //this.remove is built in to views
       this.model.bind('destroy', this.remove);
@@ -139,6 +146,28 @@ $(function(){
       delete(sol.id);
 
       this.solutions.create(sol);
+    },
+
+    fetchFileContent: function(){
+      if (!this.model.fetched){
+        this.model.fetch({
+          success:this.showFile
+        });
+      } else {
+        this.showFile();
+      }
+    },
+
+    showFile: function(){
+      var fileDisplay = new FileDisplayView();
+      fileDisplay.data = this.model.get('content');
+      fileDisplay.render();
+      var panelView = new PanelView();
+      panelView.title = this.model.get('name');
+      panelView.content = fileDisplay.el;
+      panelView.render();
+      console.log(panelView);
+      $('body').prepend(panelView.el);
     }
 
   });
@@ -171,6 +200,34 @@ $(function(){
     addAll: function() {
       resourceFiles.each(this.addOne);
     },
+  });
+
+  var FileDisplayView = Backbone.View.extend({
+    className: 'fileDisplay',
+    template: _.template($('#fileDisplay-template').html()),
+    render: function(){
+      this.$el.html(this.template({data:this.data}));
+      return this;
+    }
+  });
+
+  var PanelView = Backbone.View.extend({
+    el: $($('#panel-template').html()),
+    content:'',
+    title:'No title',
+    events: {
+      'click    .close'        : 'remove'
+    },
+    //template: _.template($('#panel-template').html()),
+    render: function(){
+      //this.$el.html(this.content);
+      this.$el.find('h1').html(this.title);
+      this.$el.find('.panel-content').html(this.content);
+      return this;
+    },
+    close: function(){
+
+    }
   });
 
   //view for an individual solution item

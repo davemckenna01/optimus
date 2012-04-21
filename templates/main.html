@@ -23,6 +23,15 @@
     .solutions-list {
       display:none;
     }
+    .panel {
+      position:absolute;
+      background-color:lightgrey;
+      border:1px solid black;
+      margin:10px;
+      display:block;
+      height:300px;
+      overflow:scroll;
+    }
   </style>
   <script src="/static/jquery.min.js"></script>
   <script src="/static/underscore.js"></script>
@@ -73,6 +82,8 @@
       <br />
       <span>Description: </span>
       <span class="fileDescription"><%=description%></span>
+      <br/>
+      <span class="viewFile">View File</span>
     </div>
     <div class="edit">
       <label for="updateName">File Name: </label>
@@ -118,6 +129,41 @@
     <span class="">Delete</span>
   </div>
 
+</script>
+
+<script type="text/template" id="fileDisplay-template">
+  <table>
+    <%var data = _.clone(data);
+      var header = data.shift();
+    %>
+    <thead>
+      <tr>
+        <% _.each(header.split(','),function(item){%>
+          <th><%=item%></th>
+        <%})%>
+      </tr>
+    </thead>
+    <tbody>
+      <% _.each(data,function(row){%>
+        <tr>
+          <% _.each(row.split(','),function(item){%>
+            <td><%=item%></td>
+          <%})%>
+        </tr>
+      <%})%>
+    </tbody>
+  </table>
+</script>
+
+<script type="text/template" id="panel-template">
+  <section class="panel">
+    <span class="close">close</span>
+    <hgroup>
+      <h1></h1>
+    </hgroup>
+    <div class="panel-content">
+    </div>
+  </section>
 </script>
 
 </body>
