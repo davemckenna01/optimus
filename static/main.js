@@ -102,20 +102,34 @@ $(function(){
       this.$el.find('.optimize').toggle();
     },
 
-    toggleSol: function(){
-      var $solList = this.$el.find('.solutions-list');
+    loadSolutions: function($el){
       if (!this.solutions){
         var solutions = new Solutions();
         solutions.blobKey = this.model.id;
         this.solutions = solutions;
-        var SolutionListView = SolutionListViewFactory($solList, solutions);
+        var SolutionListView = SolutionListViewFactory($el, this.solutions);
         var solutionListView = new SolutionListView();
         this.solutionsListView = solutionListView;
+      }
+    },
+
+    toggleSol: function(){
+      var $solList = this.$el.find('.solutions-list');
+      //need to actually load solutions before we can
+      //create more of them
+      if (!this.solutions){
+        this.loadSolutions($solList);
       }
       $solList.toggle();
     },
 
     optimize: function(){
+      var $solList = this.$el.find('.solutions-list');
+      //need to actually load solutions before we can
+      //create more of them
+      if (!this.solutions){
+        this.loadSolutions($solList);
+      }
       var sol = new Solution({
         algorithm: this.$el.find('.optimize select').val(),
         consumers: this.$el.find('.optimize input').val()
