@@ -58,7 +58,8 @@ $(function(){
       'click    .fileDestroy' : 'clear',
       'click    .close'       : 'close',
       'click    .optBtn'      : 'toggleOpt',
-      'click    .viewSolBtn'  : 'toggleSol'
+      'click    .viewSolBtn'  : 'toggleSol',
+      'click    .optimize .btn'  : 'optimize'
     },
 
     initialize: function() {
@@ -102,12 +103,28 @@ $(function(){
     },
 
     toggleSol: function(){
-      var $solList = this.$el.find('.solutions-list').toggle();
-      var solutions = new Solutions();
-      solutions.blobKey = this.model.id;
-      var SolutionListView = SolutionListViewFactory($solList, solutions);
-      var solutionListView = new SolutionListView();
-      console.log(solutionListView);
+      var $solList = this.$el.find('.solutions-list');
+      if (!this.solutions){
+        var solutions = new Solutions();
+        solutions.blobKey = this.model.id;
+        this.solutions = solutions;
+        var SolutionListView = SolutionListViewFactory($solList, solutions);
+        var solutionListView = new SolutionListView();
+        this.solutionsListView = solutionListView;
+      }
+      $solList.toggle();
+    },
+
+    optimize: function(){
+      var sol = new Solution({
+        algorithm: this.$el.find('.optimize select').val(),
+        consumers: this.$el.find('.optimize input').val()
+      });
+      //BB does a PUT if there's an id on the model, even if it's
+      //an empty string
+      delete(sol.id);
+
+      this.solutions.create(sol);
     }
 
   });
@@ -184,13 +201,11 @@ $(function(){
       // Add a single resource file item to the list by creating a view for it, and
       // appending its element to the `<ul>`.
       addOne: function(solution) {
-        console.log('wow', solution);
         var view = new SolutionView({model: solution});
         this.$el.append(view.render().el);
       },
       // Add all items in the **Todos** collection at once.
       addAll: function() {
-        console.log('ADD ALL!');
         this.solutions.each(this.addOne);
       },
     });

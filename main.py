@@ -83,6 +83,7 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
       #Another code?
       self.response.set_status('200')
 
+  #also need to delete any solutions associated with the file
   def delete(self, resource):
     resource = str(urllib.unquote(resource))
     blob_info = blobstore.BlobInfo.get(resource)
@@ -140,14 +141,16 @@ class SolutionDetailHandler(webapp.RequestHandler):
 
 
 class SolutionHandler(webapp.RequestHandler):
-  def post(self, blob_key):
+  def post(self, resource):
 
-    consumers = self.request.get('consumers')
-    algorithm = self.request.get('algorithm')
+    payload = json.loads(self.request.body)
 
-    blob_info = blobstore.BlobInfo.get(blob_key)
+    consumers = payload['consumers']
+    algorithm = payload['algorithm']
 
-    blob_reader = blobstore.BlobReader(blob_key)
+    resource = str(urllib.unquote(resource))
+    blob_info = blobstore.BlobInfo.get(resource)
+    blob_reader = blobstore.BlobReader(resource)
 
     resourceReader = csv.reader(blob_reader.readlines(), delimiter=',', quotechar='|')
 
