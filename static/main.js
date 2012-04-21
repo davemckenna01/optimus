@@ -11,7 +11,13 @@ $(function(){
       description: '',
       content: ''
     },
-    idAttribute: 'blobKey'
+
+    idAttribute: 'blobKey',
+
+    // Remove the item, destroy the model.
+    clear: function() {
+      this.destroy();
+    },
   });
 
   var ResourceFileList = Backbone.Collection.extend({
@@ -30,19 +36,22 @@ $(function(){
 
     // The DOM events specific to an item.
     events: {
-      'dblclick .fileName' : 'edit',
-    //  "click .fileDestroy"   : "clear",
-      'click .close'          : 'close'
+      'dblclick .fileName'    : 'edit',
+      'click    .fileDestroy' : 'clear',
+      'click    .close'       : 'close'
     },
 
     initialize: function() {
       _.bindAll(this, 'render', 'close', 'remove');
       this.model.bind('change', this.render);
+      //this.remove is built in to views
       this.model.bind('destroy', this.remove);
     },
 
+    del:function(){console.log('del');},
+
     render: function() {
-      //this.$el.html(this.template(tpls.resourceList, {'list': this.model.models})).attr('id',this.id);
+      console.log(this.model);
       $(this.el).html(this.template(this.model.toJSON()));
       this.updateName = this.$('.updateName');
       this.updateDescription = this.$('.updateDescription');
@@ -66,6 +75,7 @@ $(function(){
     clear: function() {
       this.model.clear();
     }
+
   });
 
   //var resourceItem = new ResourceItem({

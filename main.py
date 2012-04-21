@@ -83,6 +83,15 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
       #Another code?
       self.response.set_status('200')
 
+  def delete(self, resource):
+    resource = str(urllib.unquote(resource))
+    blob_info = blobstore.BlobInfo.get(resource)
+
+    file_meta = FileMeta.all().filter('blob_info = ', blob_info.key()).get()
+
+    #This needs to be more robust
+    file_meta.delete() and blob_info.delete()
+    self.response.set_status('200')
 
   def get(self, resource):
     resource = str(urllib.unquote(resource))
