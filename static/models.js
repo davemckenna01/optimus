@@ -17,7 +17,7 @@ var Solutions = Backbone.Collection.extend({
   model: Solution
 });
 
-var ResourceFile = Backbone.Model.extend({
+var File = Backbone.Model.extend({
   defaults: {
     blobKey: '',
     name: '',
@@ -42,7 +42,7 @@ var ResourceFile = Backbone.Model.extend({
   }
 });
 
-var ResourceFileList = Backbone.Collection.extend({
+var FileList = Backbone.Collection.extend({
   url: '/resources',
-  model: ResourceFile
+  model: File
 });

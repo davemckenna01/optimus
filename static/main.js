@@ -1,6 +1,6 @@
 $(function(){
-  var resourceFiles  = new ResourceFileList();
-  var resourceFilesView = new ResourceFileListView({
-    resourceFiles: resourceFiles
+  var files  = new FileList();
+  var filesView = new FileListView({
+    files: files
   });
 });

@@ -39,12 +39,12 @@
 
 <div id="app">
 
-<section id="resourceFiles" class="page">
+<section id="files" class="page">
 
   <header>
     <hgroup>
-      <h1>Resources</h1>
-      <h2>View and upload resources</h2>
+      <h1>Resource Files</h1>
+      <h2>Wow this is...?</h2>
     </hgroup>
   </header>
 
@@ -70,8 +70,8 @@
 
 <!-- Templates -->
 
-<script type="text/template" id="resource-template">
-  <div class="resourceFile">
+<script type="text/template" id="file-template">
+  <div class="file">
     <div class="display">
       <span>File Name: </span>
       <span class="fileName"><%=name%></span>
@@ -79,7 +79,7 @@
       <span>Description: </span>
       <span class="fileDescription"><%=description%></span>
       <br/>
-      <span class="viewFile">View File</span>
+      <span class="btn view-file-btn">View File</span>
     </div>
     <div class="edit">
       <label for="updateName">File Name: </label>
@@ -93,9 +93,9 @@
       <span class="fileDestroy">destroy</span>
     </div>
 
-    <span class="btn optBtn">Optimize</span>
+    <span class="btn opt-btn">Optimize</span>
     <br/>
-    <span class="btn viewSolBtn">View Solutions</span>
+    <span class="btn view-sol-btn">View Solutions</span>
 
     <!-- This is unforgivable repetition, FIX! -->
     <div class="optimize">
@@ -122,8 +122,8 @@
 <script type="text/template" id="solution-template">
   <div class="solution">
     <span>Cost: <%=cost%> Algorithm: <%=algorithm%> # Consumers: <%=consumers.length%></span>
-    <span class="solDetails">Details</span>
-    <span class="">Delete</span>
+    <span class="btn sol-details-btn">Details</span>
+    <span class="btn">Delete</span>
   </div>
 
 </script>

@@ -1,19 +1,17 @@
-//view for an individual resource item
-var ResourceFileView = Backbone.View.extend({
-
+//view for an individual file item
+var FileView = Backbone.View.extend({
   tagName: 'li',
-
-  template: _.template($('#resource-template').html()),
+  template: _.template($('#file-template').html()),
 
   // The DOM events specific to an item.
   events: {
     'dblclick .fileName'     : 'edit',
     'click    .fileDestroy'  : 'clear',
     'click    .close'        : 'close',
-    'click    .optBtn'       : 'toggleOpt',
-    'click    .viewSolBtn'   : 'toggleSol',
+    'click    .opt-btn'       : 'toggleOpt',
+    'click    .view-sol-btn'   : 'toggleSol',
     'click    .optimize .btn': 'optimize',
-    'click    .viewFile'     : 'fetchFileContent',
+    'click    .view-file-btn'     : 'fetchFileContent',
   },
 
   initialize: function() {
@@ -139,34 +137,34 @@ var ResourceFileView = Backbone.View.extend({
 
 });
 
-var ResourceFileListView = Backbone.View.extend({
+var FileListView = Backbone.View.extend({
   el: $('#files-list'),
 
   initialize: function() {
     _.bindAll(this, 'addOne', 'addAll', 'render');
 
-    this.resourceFiles = this.options.resourceFiles;
+    this.files = this.options.files;
 
-    this.resourceFiles.bind('add',     this.addOne);
-    this.resourceFiles.bind('reset',   this.addAll);
-    this.resourceFiles.bind('all',     this.render);
+    this.files.bind('add',     this.addOne);
+    this.files.bind('reset',   this.addAll);
+    this.files.bind('all',     this.render);
 
-    this.resourceFiles.fetch();
+    this.files.fetch();
   },
 
   render: function() {
   },
 
-  // Add a single resource file item to the list by creating a view for it, and
+  // Add a single file item to the list by creating a view for it, and
   // appending its element to the `<ul>`.
-  addOne: function(resourceFile) {
-    var view = new ResourceFileView({model: resourceFile});
+  addOne: function(file) {
+    var view = new FileView({model: file});
     this.$el.append(view.render().el);
   },
 
   // Add all items in the **Todos** collection at once.
   addAll: function() {
-    this.resourceFiles.each(this.addOne);
+    this.files.each(this.addOne);
   },
 });
 
@@ -212,7 +210,7 @@ var SolutionView = Backbone.View.extend({
   tagName: 'li',
   template: _.template($('#solution-template').html()),
   events: {
-    'click    .solDetails'      : 'showSolution',
+    'click    .sol-details-btn'      : 'showSolution',
   },
   initialize: function() {
     _.bindAll(this, 'render', 'showSolution');
@@ -299,7 +297,7 @@ function SolutionListViewFactory($el, solutions, fileModel) {
       console.log('render()');
       this.addAll();
     },
-    // Add a single resource file item to the list 
+    // Add a single file item to the list 
     // by creating a view for it, and
     // appending its element to the `<ul>`.
     addOne: function(solution) {
