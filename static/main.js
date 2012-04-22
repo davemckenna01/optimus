@@ -39,9 +39,11 @@ $(function(){
 
     //override Model.fetch()
     fetch: function(opts){
-      //there's probably a more Backboney way to do this...
-      this.fetched = true;
-      Backbone.Model.prototype.fetch.call(this, opts);
+      if(!this.fetched){
+        //there's probably a more Backboney way to do this...
+        Backbone.Model.prototype.fetch.call(this, opts);
+        this.fetched = true;
+      }
     }
   });
 
@@ -215,6 +217,15 @@ $(function(){
     },
   });
 
+  var SolutionDisplayView = Backbone.View.extend({
+    className: 'solutionDisplay',
+    template: _.template($('#solutionDisplay-template').html()),
+    render: function(){
+      this.$el.html(this.template({data:this.data}));
+      return this;
+    }
+  });
+
   var FileDisplayView = Backbone.View.extend({
     className: 'fileDisplay',
     template: _.template($('#fileDisplay-template').html()),
@@ -247,10 +258,9 @@ $(function(){
   var SolutionView = Backbone.View.extend({
     tagName: 'li',
     template: _.template($('#solution-template').html()),
-    // The DOM events specific to an item.
-    //events: {
-    //  'click    .optBtn'      : 'toggleOpt',
-    //},
+    events: {
+      'click    .solDetails'      : 'showSolution',
+    },
     initialize: function() {
       //_.bindAll(this, 'render', 'close', 'remove');
       _.bindAll(this, 'render');
@@ -262,6 +272,61 @@ $(function(){
       this.$el.html(this.template(this.model.toJSON()));
       return this;
     },
+    showSolution: function(){
+      var self = this,
+          file = resourceFiles._byId[this.model.get('blobKey')];
+      function cb(){
+        var solutionDisplay = new SolutionDisplayView(),
+            resources = _.clone(file.get('content')),
+            matrix = [],
+            rowState = [],
+            blankRow = [],
+            panelView = new PanelView(),
+            i,j;
+
+        solutionDisplay.data = self.model.toJSON();
+
+        resources.shift();
+        //console.log(resources);
+        for (i=0, l=self.model.get('consumers').length; i<l; i+=1){
+          rowState.push(0);
+          blankRow.push(null);
+        }
+
+        //v is one of [0,0,1,2,1,0,0,2,1]
+        //rowState starts at [0,0,0]
+        //ends up like       [2,1,0]
+
+        matrix.push(_.clone(blankRow));
+        i = 0;
+        _.each(self.model.get('vector'),function(v){
+          if (rowState[v] > matrix.length - 1)
+            matrix.push(_.clone(blankRow));
+          //console.log('assigning to row',rowState[v],'slot ',v,'value',i);
+          matrix[rowState[v]][v]=resources[i].substr(0,resources[i].indexOf(','));
+          rowState[v] += 1;
+          i += 1;
+        });
+
+        //console.log(matrix);
+
+        solutionDisplay.data.resMatrix = matrix;
+        solutionDisplay.render();
+
+        panelView.title = file.get('name');
+        panelView.content = solutionDisplay.el;
+        panelView.render();
+
+        $('body').prepend(panelView.el);
+      }
+
+      //kinda smells...
+      if (!file.fetched){
+        file.fetch({success:cb});
+      } else {
+        cb();
+      }
+    }
   });
 
   //this needs to be passed a list of solutions (a bb collection)

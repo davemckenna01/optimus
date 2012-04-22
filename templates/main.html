@@ -125,7 +125,7 @@
 <script type="text/template" id="solution-template">
   <div class="solution">
     <span>Cost: <%=cost%> Algorithm: <%=algorithm%> # Consumers: <%=consumers.length%></span>
-    <span class="">Details</span>
+    <span class="solDetails">Details</span>
     <span class="">Delete</span>
   </div>
 
@@ -147,6 +147,35 @@
       <% _.each(data,function(row){%>
         <tr>
           <% _.each(row.split(','),function(item){%>
+            <td><%=item%></td>
+          <%})%>
+        </tr>
+      <%})%>
+    </tbody>
+  </table>
+</script>
+
+algorithm: "genetic"
+blobKey: "Nw5F4d4d8q0sef3K9UDkCg=="
+consumers: Array[2]
+cost: 5
+solKey: "ag5kZXZ-b3B0aW11c2FwcHIPCxIIU29sdXRpb24YzwEM"
+vector: Array[34]
+
+<script type="text/template" id="solutionDisplay-template">
+  <div>Cost: <%=data.cost%> Algorithm: <%=data.algorithm%></div>
+  <table>
+    <thead>
+      <tr>
+        <% _.each(data.consumers,function(item){%>
+          <th><%=item%></th>
+        <%})%>
+      </tr>
+    </thead>
+    <tbody>
+      <% _.each(data.resMatrix,function(row){%>
+        <tr>
+          <% _.each(row, function(item){%>
             <td><%=item%></td>
           <%})%>
         </tr>
