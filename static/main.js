@@ -76,6 +76,10 @@ $(function(){
       this.model.bind('change', this.render);
       //this.remove is built in to views
       this.model.bind('destroy', this.remove);
+      this.subViewStates = {
+        sol: false,
+        opt: false
+      };
     },
 
     del:function(){console.log('del');},
@@ -84,16 +88,22 @@ $(function(){
       $(this.el).html(this.template(this.model.toJSON()));
       this.updateName = this.$('.updateName');
       this.updateDescription = this.$('.updateDescription');
+      var display = this.subViewStates.opt ? 'block' : 'none';
+      this.$optForm = this.$el.find('.optimize')
+                          .css('display', display);
 
       //Need to redraw solution list
       //I don't like this. If this conditional runs, it's b/c
-      //the file was redrawn after the fetch to get file
+      //the file view was redrawn after the fetch() to get file
       //contents
       if (this.solutionListView){
         //but the original element is gone, so need to 
         //add a new one
-        this.solutionListView.el = this.$el.find('.solutions-list')[0];
-        this.solutionListView.$el = this.$el.find('.solutions-list');
+        var display = this.subViewStates.sol ? 'block' : 'none';
+        this.solutionListView.el = this.$el.find('.solutions-list')
+                                  .css('display', display)[0];
+        this.solutionListView.$el = this.$el.find('.solutions-list')
+                                  .css('display', display);
         this.solutionListView.render();
       }
       /////////////////////////////////
@@ -101,7 +111,7 @@ $(function(){
       return this;
     },
 
-    // Switch this view into `"editing"` mode, displaying the input field.
+    // Switch this view into `"editing"` mode, displaying the input fields.
     edit: function() {
       $(this.el).addClass("editing");
       this.updateName.focus();
@@ -117,12 +127,6 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.model.clear();
-    },
-
-    toggleOpt: function(){
-      //we should insert the horribly repeated code here,
-      //maybe? Even that seems bad somehow...
-      this.$el.find('.optimize').toggle();
     },
 
     loadSolutions: function($el){
@@ -143,7 +147,13 @@ $(function(){
       if (!this.solutions){
         this.loadSolutions($solList);
       }
+      this.subViewStates.sol = this.subViewStates.sol ? false : true;
       $solList.toggle();
+    },
+
+    toggleOpt: function(){
+      this.subViewStates.opt = this.subViewStates.opt? false : true;
+      this.$optForm.toggle();
     },
 
     optimize: function(){
@@ -154,8 +164,8 @@ $(function(){
         this.loadSolutions($solList);
       }
       var sol = new Solution({
-        algorithm: this.$el.find('.optimize select').val(),
-        consumers: this.$el.find('.optimize input').val()
+        algorithm: this.$optForm.find('select').val(),
+        consumers: this.$optForm.find('input').val()
       });
       //BB does a PUT if there's an id on the model, even if it's
       //an empty string
@@ -290,12 +300,8 @@ $(function(){
         //console.log(resources);
         for (i=0, l=self.model.get('consumers').length; i<l; i+=1){
           rowState.push(0);
-          blankRow.push(null);
+          blankRow.push("");
         }
-
-        //v is one of [0,0,1,2,1,0,0,2,1]
-        //rowState starts at [0,0,0]
-        //ends up like       [2,1,0]
 
         matrix.push(_.clone(blankRow));
         i = 0;
