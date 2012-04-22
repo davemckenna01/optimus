@@ -1,6 +1,5 @@
 window.gfiles;
-window.gsols;
-window.afile;
+window.gfileviews;
 
 $(function(){
 
@@ -40,6 +39,7 @@ $(function(){
 
     //override Model.fetch()
     fetch: function(opts){
+      //there's probably a more Backboney way to do this...
       this.fetched = true;
       Backbone.Model.prototype.fetch.call(this, opts);
     }
@@ -70,7 +70,7 @@ $(function(){
     },
 
     initialize: function() {
-      _.bindAll(this, 'render', 'close', 'remove', 'showFile');
+      _.bindAll(this, 'render', 'close', 'remove', 'showFile', 'loadSolutions');
       this.model.bind('change', this.render);
       //this.remove is built in to views
       this.model.bind('destroy', this.remove);
@@ -78,10 +78,24 @@ $(function(){
 
     del:function(){console.log('del');},
 
-    render: function() {
+    render: function(e) {
       $(this.el).html(this.template(this.model.toJSON()));
       this.updateName = this.$('.updateName');
       this.updateDescription = this.$('.updateDescription');
+
+      //Need to redraw solution list
+      //I don't like this. If this conditional runs, it's b/c
+      //the file was redrawn after the fetch to get file
+      //contents
+      if (this.solutionListView){
+        //but the original element is gone, so need to 
+        //add a new one
+        this.solutionListView.el = this.$el.find('.solutions-list')[0];
+        this.solutionListView.$el = this.$el.find('.solutions-list');
+        this.solutionListView.render();
+      }
+      /////////////////////////////////
+
       return this;
     },
 
@@ -116,7 +130,7 @@ $(function(){
         this.solutions = solutions;
         var SolutionListView = SolutionListViewFactory($el, this.solutions);
         var solutionListView = new SolutionListView();
-        this.solutionsListView = solutionListView;
+        this.solutionListView = solutionListView;
       }
     },
 
@@ -166,7 +180,6 @@ $(function(){
       panelView.title = this.model.get('name');
       panelView.content = fileDisplay.el;
       panelView.render();
-      console.log(panelView);
       $('body').prepend(panelView.el);
     }
 
@@ -247,8 +260,6 @@ $(function(){
     },
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
-      //this.updateName = this.$('.updateName');
-      //this.updateDescription = this.$('.updateDescription');
       return this;
     },
   });
@@ -263,20 +274,29 @@ $(function(){
 
         this.solutions.bind('add',     this.addOne);
         this.solutions.bind('reset',   this.addAll);
-        this.solutions.bind('all',     this.render);
+        //What's the deal with the "all" event?
+        //I don't like the sounds of it...
+        //this.solutions.bind('all',     this.render);
 
         this.solutions.fetch();
       },
       render: function() {
+        console.log('render()');
+        this.addAll();
       },
       // Add a single resource file item to the list by creating a view for it, and
       // appending its element to the `<ul>`.
       addOne: function(solution) {
+        console.log('addOne()');
         var view = new SolutionView({model: solution});
         this.$el.append(view.render().el);
       },
       // Add all items in the **Todos** collection at once.
       addAll: function() {
+        //reset wrapper el
+        console.log('addAll()');
+        console.log(this.el);
+        this.$el.html('');
         this.solutions.each(this.addOne);
       },
     });
@@ -288,6 +308,7 @@ $(function(){
 
   //make a global to access in the console
   gfiles = resourceFiles;
+  gfileviews = resourceFilesView;
 
 
 });
