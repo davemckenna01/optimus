@@ -32,7 +32,7 @@ class Solution(db.Model):
 
 class MainHandler(webapp.RequestHandler):
   def get(self):
-    path = os.path.join(os.path.dirname(__file__), 'templates/main.html')
+    path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
     self.response.out.write(template.render(path, {'upload_url': '/resources'}))
 
 
@@ -197,7 +197,7 @@ class SolutionHandler(webapp.RequestHandler):
     self.response.out.write(json.dumps(j))
 
 
-app = webapp.WSGIApplication([('/main', MainHandler),
+app = webapp.WSGIApplication([('/', MainHandler),
                                ('/resources/(.+?)/solutions/(.+?)', SolutionDetailHandler),
                                ('/resources/(.+?)/solutions', SolutionHandler),
                                ('/resources/(.+?)', ResourceDetailHandler),
