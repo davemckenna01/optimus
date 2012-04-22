@@ -128,7 +128,7 @@
 
 </script>
 
-<script type="text/template" id="fileDisplay-template">
+<script type="text/template" id="file-display-template">
   <table>
     <%var data = _.clone(data);
       var header = data.shift();
@@ -152,7 +152,7 @@
   </table>
 </script>
 
-<script type="text/template" id="solutionDisplay-template">
+<script type="text/template" id="solution-display-template">
   <div>Cost: <%=data.cost%> Algorithm: <%=data.algorithm%></div>
   <table>
     <thead>
@@ -163,7 +163,7 @@
       </tr>
     </thead>
     <tbody>
-      <% _.each(data.resMatrix,function(row){%>
+      <% _.each(data.matrix,function(row){%>
         <tr>
           <% _.each(row, function(item){%>
             <td><%=item%></td>

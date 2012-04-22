@@ -3,4 +3,5 @@ $(function(){
   var filesView = new FileListView({
     files: files
   });
+  window.gfiles = files;
 });

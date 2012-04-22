@@ -12,7 +12,7 @@ var Solution = Backbone.Model.extend({
 
 var Solutions = Backbone.Collection.extend({
   url: function(){
-    return '/resources/' + this.blobKey + '/solutions';
+    return '/resources/' + this.fileId + '/solutions';
   },
   model: Solution
 });
