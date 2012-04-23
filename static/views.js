@@ -133,6 +133,9 @@ var FileView = Backbone.View.extend({
       }
       handleError = _.bind(handleError, this);
       sol.on('error', handleError);
+      sol.on('sync', function(model){
+        model.view.viewSolution();
+      });
       /////////////////////////////////////////////////
 
       if (sol.set({
@@ -361,6 +364,11 @@ function SolutionListViewFactory(el, solutions, fileModel) {
         fileModel: this.fileModel
       });
       this.$el.append(view.render().el);
+
+      //add a reference to the solution view
+      //to the model...is there no way to do
+      //this in Backbone "natively"?
+      solution.view = view;
     },
     // Add all items in the collection at once.
     addAll: function() {
