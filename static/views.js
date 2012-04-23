@@ -5,72 +5,67 @@ var FileView = Backbone.View.extend({
 
   // The DOM events specific to an item.
   events: {
-    'dblclick .fileName'     : 'edit',
-    'click    .fileDestroy'  : 'clear',
-    'click    .close'        : 'close',
+    'dblclick .fileName'      : 'edit',
+    'click    .fileDestroy'   : 'clear',
+    'click    .close'         : 'close',
     'click    .opt-btn'       : 'toggleOpt',
-    'click    .view-sol-btn'   : 'toggleSol',
-    'click    .optimize .btn': 'optimize',
-    'click    .view-file-btn'     : 'viewFile',
+    'click    .view-sol-btn'  : 'toggleSol',
+    'click    .optimize .btn' : 'optimize',
+    'click    .view-file-btn' : 'viewFile',
   },
 
   initialize: function() {
     _.bindAll(this, 'render', 'close', 'remove', 
-              'viewFile', 'loadSolutionsModel', 'refreshSubViews');
+      'viewFile', 'loadSolutionsModel', 'refreshSubviews');
 
     this.model.bind('change', this.render);
     this.model.bind('destroy', this.remove);
 
     //this manages the toggle()/display state of the file view's
     //sub views (solution list, and optimize form)
-    this.subViewStates = {
+    this.subviewStates = {
       sol: false,
       opt: false
     };
   },
 
-  render: function(e) {
+  render: function() {
     this.$el.html(this.template(this.model.toJSON()));
-    this.$updateName = this.$el.find('.updateName');
-    this.$updateDescription = this.$el.find('.updateDescription');
-    this.refreshSubViews();
+    this.$nameField = this.$el.find('.nameField');
+    this.$descField = this.$el.find('.descField');
+    this.refreshSubviews();
     return this;
   },
 
-  refreshSubViews: function(){
-    var display = this.subViewStates.opt ? 'block' : 'none';
-
+  refreshSubviews: function(){
+    //Set whether the optimize form is open or closed
+    var display = this.subviewStates.opt ? 'block' : 'none';
     this.$optForm = this.$el.find('.optimize')
                         .css('display', display);
 
-    //Need to redraw solution list
-    //I don't like this. If this conditional runs, it's b/c
-    //the file view was redrawn after the fetch() to get file
-    //contents.
+    //This occurs when we fetch the solutions list before fetching the
+    //file contents. When a file is fetched it's view gets redrawn,
+    //which means we must redraw the solution list
     if (this.solutionListView){
-      //but the original element is gone, so need to 
-      //add a new one
-      display = this.subViewStates.sol ? 'block' : 'none';
-
-      this.solutionListView.el = this.$el.find('.solutions-list')
-                                .css('display', display)[0];
-      this.solutionListView.$el = this.$el.find('.solutions-list')
-                                .css('display', display);
+      display = this.subviewStates.sol ? 'block' : 'none';
+      var $solList = this.$el.find('.solutions-list').css('display', display)
+      this.solutionListView.el = $solList.get(0);
+      this.solutionListView.$el = $solList;
       this.solutionListView.render();
     }
   },
 
-  // Switch this view into `"editing"` mode, displaying the input fields.
+  // Switch this view into "editing" mode displaying the input fields.
   edit: function() {
     this.$el.addClass("editing");
-    this.$updateName.focus();
+    this.$nameField.focus();
   },
 
-  // Close the `"editing"` mode, saving changes to the todo.
+  // Close the "editing" mode, saving changes to the file
   close: function() {
     this.model.save({
-      name: this.$updateName.val(),
-      description: this.$updateDescription.val()
+      name: this.$nameField.val(),
+      description: this.$descField.val()
     });
     this.$el.removeClass("editing");
   },
@@ -80,57 +75,72 @@ var FileView = Backbone.View.extend({
     this.model.clear();
   },
 
-  loadSolutionsModel: function(el){
+  loadSolutionsModel: function(el, cb){
+    var SolutionListView;
+
     if (!this.solutionsModel){
       this.solutionsModel = new Solutions();
       this.solutionsModel.fileId = this.model.id;
-      var SolutionListView = SolutionListViewFactory(el, this.solutionsModel, this.model);
+
+      if (cb) this.solutionsModel.bind('reset', cb);
+
+      SolutionListView = SolutionListViewFactory(
+          el, this.solutionsModel, this.model);
       this.solutionListView = new SolutionListView();
     }
   },
 
   toggleSol: function(){
     var $solList = this.$el.find('.solutions-list');
+
     //if solutions haven't already been loaded, load them
     if (!this.solutionsModel){
       this.loadSolutionsModel($solList.get(0));
     }
-    this.subViewStates.sol = this.subViewStates.sol ? false : true;
+    this.subviewStates.sol = this.subviewStates.sol ? false : true;
     $solList.toggle();
   },
 
   toggleOpt: function(){
-    this.subViewStates.opt = this.subViewStates.opt? false : true;
+    this.subviewStates.opt = this.subviewStates.opt? false : true;
     this.$optForm.toggle();
   },
 
   optimize: function(){
-    var $solList = this.$el.find('.solutions-list');
-    //if solutions haven't already been loaded, load them
-    if (!this.solutionsModel){
-      this.loadSolutionsModel($solList);
-    }
-    var sol = new Solution({
-      algorithm: this.$optForm.find('select').val(),
-      consumers: this.$optForm.find('input').val()
-    });
-    //Backbone does a PUT if there's an id on the model, 
-    //even if it's an empty string, and the way I'm
-    //initing this model it has an empty string, so
-    //need to delete it.
-    delete(sol.id);
+    function create(){
+      var sol = new Solution({
+        algorithm: this.$optForm.find('select').val(),
+        consumers: this.$optForm.find('input').val()
+      });
 
-    this.solutionsModel.create(sol);
+      //Backbone does a PUT if there's an id on the model, 
+      //even if it's an empty string, and the way I'm
+      //initing this model it has an empty string, so
+      //need to delete it.
+      delete(sol.id);
+
+      this.solutionsModel.create(sol);
+    }
+    create = _.bind(create, this);
+
+    //if solutions haven't already been loaded, load them and then
+    //create the new solution, else don't load and just create
+    !this.solutionsModel ?
+      this.loadSolutionsModel(this.$el.find('.solutions-list'), create)
+      : create();
   },
 
   viewFile: function(){
     function display(){
-      var fileDisplayView = new FileDisplayView({
+      var fileDisplayView,
+          panelView;
+
+      fileDisplayView = new FileDisplayView({
         data: this.model.get('content')
       });
       fileDisplayView.render();
 
-      var panelView = new PanelView({
+      panelView = new PanelView({
         title: this.model.get('name'),
         content: fileDisplayView.el
       });
