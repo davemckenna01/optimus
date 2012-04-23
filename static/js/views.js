@@ -15,7 +15,7 @@ var FileView = Backbone.View.extend({
   },
 
   initialize: function() {
-    _.bindAll(this, 'render', 'done', 'remove', 
+    _.bindAll(this, 'render', 'done', 'remove', 'edit',
       'viewFile', 'loadSolutionsModel', 'refreshSubviews');
 
     this.model.bind('change', this.render);
@@ -37,6 +37,7 @@ var FileView = Backbone.View.extend({
     this.$descField = this.$el.find('.descField');
     this.$consumersField = this.$el.find('.consumersField');
     this.$consumersFieldError = this.$el.find('.consumersFieldError');
+    this.$optForm = this.$el.find('.optimize');
     this.refreshSubviews();
 
     return this;
@@ -45,8 +46,7 @@ var FileView = Backbone.View.extend({
   refreshSubviews: function(){
     //Set whether the optimize form is open or closed
     var display = this.subviewStates.opt ? 'block' : 'none';
-    this.$optForm = this.$el.find('.optimize')
-                        .css('display', display);
+    this.$optForm.css('display', display);
 
     //This occurs when we fetch the solutions list before fetching the
     //file contents. When a file is fetched it's view gets redrawn,
@@ -64,6 +64,12 @@ var FileView = Backbone.View.extend({
   edit: function() {
     this.$el.addClass("editing");
     this.$nameField.focus();
+
+    //close other views when entering edit mode
+    if (this.solutionListView) {
+      if (this.subviewStates.sol) this.toggleSol();
+    }
+    if (this.subviewStates.opt) this.toggleOpt();
   },
 
   // Close the "editing" mode, saving changes to the file
