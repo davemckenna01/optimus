@@ -38,22 +38,15 @@
         <span id="autobot"></span>
       </a>
       <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        <!--<span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>-->
+        <i class="icon-upload icon-white"></i>
       </a>
       <div class="nav-collapse">
-        <!--<ul class="nav">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>-->
         <form id="upload-form" class="form-inline" action="/resources" method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <br>
             <input class="input-medium" type="text" name="customFilename" placeholder="Filename (optional)" value="">
             <input class="input-medium" type="text" name="description" placeholder="Description (optional)" value="">
-            <button class="btn" type="submit" >Upload</button>
+            <button class="btn btn-success" type="submit" ><i class="icon-upload icon-white"></i> Upload</button>
         </form>
       </div><!--/.nav-collapse -->
     </div>
@@ -63,7 +56,7 @@
 <div class="container">
 
   <h1>Upload files and optimize them</h1>
-  <p>Wait... what? If you have a list of resources you want to distribute <strong>evenly</strong> among 2 or more consumers of those resources...</p>
+  <p>Wait... what? If you have a list of resources you want to distribute <strong>evenly</strong> among 2 or<br>more "consumers", upload a file in csv, click the optimize button, choose an algorithm,<br> and enter 2 or more consumers.</p>
 
   <div id="app">
     <div id="files" class="page">
@@ -80,9 +73,9 @@
 <script type="text/template" id="file-template">
   <div class="file">
     <div class="display">
-      <span class="file-label fileName"><strong>File:</strong> <%=name%></span>
+      <span class="item-label fileName"><strong>File:</strong> <%=name%></span>
       <br />
-      <span class="file-label fileDescription"><strong>Description:</strong> <%=description%></span>
+      <span class="item-label fileDescription"><strong>Description:</strong> <%=description%></span>
       <br/>
       <button class="btn btn-inverse opt-btn"><i class="icon-play-circle icon-white"></i> Optimize</button>
       <button class="btn edit-btn"><i class="icon-edit"></i> Edit</button>
@@ -126,7 +119,7 @@
 
 <script type="text/template" id="solution-template">
   <div class="solution">
-    <span>Cost: <%=cost%> Algorithm: <%=algorithm%> # Consumers: <%=consumers.length%></span>
+    <span class="item-label">Cost: <%=cost%> Algorithm: <%=algorithm%> # Consumers: <%=consumers.length%></span>
     <br>
     <a class="btn btn-primary sol-details-btn"><i class="icon-list-alt icon-white"></i> Details</a>
     <button class="btn btn-danger solution-destroy"><i class="icon-trash icon-white"></i>Delete</button>

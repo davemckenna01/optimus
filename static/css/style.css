@@ -2,11 +2,11 @@
 .page {}
 .btn {}
 
-#files-list {
+ul {
   margin:0;
   padding:0;
 }
-#files-list li {
+ul li {
   padding:10px;
   list-style:none;
 }
@@ -20,18 +20,20 @@
 #files-list .editing .edit {
   display: block;
 }
-.file .file-label {
+.file .item-label,
+.solution .item-label
+{
   font-size:1.3em;
 }
-.file {
-  line-height:1.7em;
+.file, .solution {
+  line-height:2.2em;
 }
 
 .optimize {
   display:none;
   margin-top:15px;
   padding:10px;
-  background-color:#ddd;
+  background-color:#eee;
 }
 .solutions-list {
   display:none;
@@ -73,4 +75,13 @@
 .navbar span {
   display:block;
   margin:0 auto;
+}
+
+.btn-navbar {
+  color:white;
+}
+
+.solution {
+  background-color:#eee;
+  padding:10px;
 }
