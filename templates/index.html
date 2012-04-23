@@ -1,85 +1,93 @@
-<!doctype html>
-<html>
-<head>
-  <title>Optimus</title>
-  <style>
-    .page {border:1px solid red;}
-    .btn {background-color:pink;}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Optimus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    #files-list li.editing {
-    }
-    #files-list .editing .display,
-    #files-list .edit {
-      display: none;
-    }
-    #files-list .editing .edit {
-      display: block;
-    }
-    #files-list .editing input {
-    }
-    .optimize {
-      display:none;
-    }
-    .solutions-list {
-      display:none;
-    }
-    .panel {
-      position:absolute;
-      background-color:lightgrey;
-      border:1px solid black;
-      margin:10px;
-      display:block;
-      height:300px;
-      overflow:scroll;
-    }
-  </style>
-</head>
+    <!-- Le styles -->
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 110px; /* 110px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/static/img/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/img/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/img/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/static/img/ico/apple-touch-icon-57-precomposed.png">
+  </head>
 <body>
 
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">
+        <!--<span>Optimus</span>-->
+        <span id="autobot"></span>
+      </a>
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <!--<span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>-->
+      </a>
+      <div class="nav-collapse">
+        <!--<ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>-->
+        <form id="upload-form" class="form-inline" action="/resources" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <br>
+            <input class="input-medium" type="text" name="customFilename" placeholder="Filename (optional)" value="">
+            <input class="input-medium" type="text" name="description" placeholder="Description (optional)" value="">
+            <button class="btn" type="submit" >Upload</button>
+        </form>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
 
-<div id="app">
+<div class="container">
 
-<section id="files" class="page">
+  <h1>Upload files and optimize them</h1>
+  <p>Wait... what? If you have a list of resources you want to distribute <strong>evenly</strong> among 2 or more consumers of those resources...</p>
 
-  <header>
-    <hgroup>
-      <h1>Resource Files</h1>
-      <h2>Wow this is...?</h2>
-    </hgroup>
-  </header>
-
-  <div>
-    <form action="/resources" method="POST" enctype="multipart/form-data">
-      <label for="file">Upload a file</label>
-      <input type="file" name="file"><br> 
-      <label for="customFilename">Custom Filename?</label>
-      <input type="text" name="customFilename" value=""><br> 
-      <label for="description">Description</label>
-      <input type="text" name="description" value=""><br> 
-      <input type="submit" name="submit" value="Submit">
-    </form>
-
-    <ul id="files-list">
-    </ul>
-
+  <div id="app">
+    <div id="files" class="page">
+      <ul id="files-list">
+      </ul>
+    </div>
   </div>
 
-</section>
+</div> <!-- /container -->
 
-</div>
 
 <!-- Templates -->
 
 <script type="text/template" id="file-template">
   <div class="file">
     <div class="display">
-      <span>File Name: </span>
-      <span class="fileName"><%=name%></span>
+      <span class="file-label fileName"><strong>File:</strong> <%=name%></span>
       <br />
-      <span>Description: </span>
-      <span class="fileDescription"><%=description%></span>
+      <span class="file-label fileDescription"><strong>Description:</strong> <%=description%></span>
       <br/>
-      <span class="btn view-file-btn">View File</span>
+      <button class="btn btn-inverse opt-btn"><i class="icon-play-circle icon-white"></i> Optimize</button>
+      <button class="btn edit-btn"><i class="icon-edit"></i> Edit</button>
+      <span class="btn btn-primary view-file-btn"><i class="icon-list-alt icon-white"></i> View File</span>
+      <a class="btn btn-primary view-sol-btn"><i class="icon-list-alt icon-white"></i> View Solutions</a>
     </div>
     <div class="edit">
       <label for="nameField">File Name: </label>
@@ -89,14 +97,9 @@
       <label for="descField">Description: </label>
       <input class="descField" name="descField" type="text" value="<%= description %>" />
       <br />
-      <span class="close">Done</span>
-      <br />
-      <span class="file-destroy">destroy</span>
+      <button class="btn btn-success done"><i class="icon-ok icon-white"></i> Done</button>
+      <button class="btn btn-danger file-destroy"><i class="icon-trash icon-white"></i> Delete</button>
     </div>
-
-    <span class="btn opt-btn">Optimize</span>
-    <br/>
-    <span class="btn view-sol-btn">View Solutions</span>
 
     <!-- This is unforgivable repetition, FIX! -->
     <div class="optimize">
@@ -111,7 +114,7 @@
       <input class="consumersField" type="text" name="consumersField" placeholder="comma, seperated, list" />
       <span class="error consumersFieldError"></span>
       <br />
-      <span class="btn">GO!</span>
+      <button class="btn btn-success"><i class="icon-play-circle icon-white"></i> Do it!</button>
     </div>
     <!-- ------------------------------------- -->
 
@@ -124,14 +127,15 @@
 <script type="text/template" id="solution-template">
   <div class="solution">
     <span>Cost: <%=cost%> Algorithm: <%=algorithm%> # Consumers: <%=consumers.length%></span>
-    <span class="btn sol-details-btn">Details</span>
-    <span class="btn solution-destroy">Delete</span>
+    <br>
+    <a class="btn btn-primary sol-details-btn"><i class="icon-list-alt icon-white"></i> Details</a>
+    <button class="btn btn-danger solution-destroy"><i class="icon-trash icon-white"></i>Delete</button>
   </div>
 
 </script>
 
 <script type="text/template" id="file-display-template">
-  <table>
+  <table class="table-striped table-bordered table-condensed">
     <%var data = _.clone(data);
       var header = data.shift();
     %>
@@ -156,7 +160,7 @@
 
 <script type="text/template" id="solution-display-template">
   <div>Cost: <%=data.cost%> Algorithm: <%=data.algorithm%></div>
-  <table>
+  <table class="table-striped table-bordered table-condensed">
     <thead>
       <tr>
         <% _.each(data.consumers,function(item){%>
@@ -177,22 +181,21 @@
 </script>
 
 <script type="text/template" id="panel-template">
-  <section class="panel">
-    <span class="close">close</span>
-    <hgroup>
-      <h1></h1>
-    </hgroup>
+  <div class="panel">
+    <span class="close" title="Close"><i class="icon-remove"></i></span>
+    <h2></h2>
     <div class="panel-content">
     </div>
-  </section>
+  </div>
 </script>
 
-<script src="/static/jquery.min.js"></script>
-<script src="/static/underscore.js"></script>
-<script src="/static/backbone.js"></script>
-<script src="/static/models.js"></script>
-<script src="/static/views.js"></script>
-<script src="/static/main.js"></script>
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.js"></script>
+<script src="/static/js/underscore.js"></script>
+<script src="/static/js/backbone.js"></script>
+<script src="/static/js/models.js"></script>
+<script src="/static/js/views.js"></script>
+<script src="/static/js/main.js"></script>
 
 </body>
 </html>

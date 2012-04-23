@@ -5,9 +5,9 @@ var FileView = Backbone.View.extend({
 
   // The DOM events specific to an item.
   events: {
-    'dblclick .fileName'      : 'edit',
-    'click    .file-destroy'   : 'clear',
-    'click    .close'         : 'close',
+    'click     .edit-btn'     : 'edit',
+    'click    .file-destroy'  : 'clear',
+    'click    .done'          : 'done',
     'click    .opt-btn'       : 'toggleOpt',
     'click    .view-sol-btn'  : 'toggleSol',
     'click    .optimize .btn' : 'optimize',
@@ -15,7 +15,7 @@ var FileView = Backbone.View.extend({
   },
 
   initialize: function() {
-    _.bindAll(this, 'render', 'close', 'remove', 
+    _.bindAll(this, 'render', 'done', 'remove', 
       'viewFile', 'loadSolutionsModel', 'refreshSubviews');
 
     this.model.bind('change', this.render);
@@ -67,7 +67,7 @@ var FileView = Backbone.View.extend({
   },
 
   // Close the "editing" mode, saving changes to the file
-  close: function() {
+  done: function() {
     /////////////////////////////////////////////////
     //this is totally not the right spot for this...
     function handleError(model, err){
@@ -244,7 +244,7 @@ var PanelView = Backbone.View.extend({
     'click .close': 'remove'
   },
   render: function(){
-    this.$el.find('h1').html(this.options.title);
+    this.$el.find('h2').html(this.options.title);
     this.$el.find('.panel-content').html(this.options.content);
     $('body').prepend(this.el);
     return this;
