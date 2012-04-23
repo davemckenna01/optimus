@@ -10,9 +10,14 @@ var Solution = Backbone.Model.extend({
 
   idAttribute: 'solKey',
 
+  // Remove the item, destroy the model.
+  clear: function() {
+    this.destroy();
+  },
+
   validate: function(attrs){
     if (attrs.consumers.length < 2){
-      return 'Enter more than one consumer';
+      return 'Enter 2 or more consumers';
     }
   }
 });

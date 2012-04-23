@@ -6,7 +6,7 @@ var FileView = Backbone.View.extend({
   // The DOM events specific to an item.
   events: {
     'dblclick .fileName'      : 'edit',
-    'click    .fileDestroy'   : 'clear',
+    'click    .file-destroy'   : 'clear',
     'click    .close'         : 'close',
     'click    .opt-btn'       : 'toggleOpt',
     'click    .view-sol-btn'  : 'toggleSol',
@@ -86,7 +86,7 @@ var FileView = Backbone.View.extend({
     }
   },
 
-  // Remove the item, destroy the model.
+  //destroys the model
   clear: function() {
     this.model.clear();
   },
@@ -257,9 +257,10 @@ var SolutionView = Backbone.View.extend({
   template: _.template($('#solution-template').html()),
   events: {
     'click .sol-details-btn': 'viewSolution',
+    'click .solution-destroy': 'clear'
   },
   initialize: function() {
-    _.bindAll(this, 'render', 'viewSolution');
+    _.bindAll(this, 'render', 'viewSolution', 'clear', 'remove');
     this.model.bind('change', this.render);
     this.model.bind('destroy', this.remove);
     this.fileModel = this.options.fileModel;
@@ -268,6 +269,12 @@ var SolutionView = Backbone.View.extend({
     this.$el.html(this.template(this.model.toJSON()));
     return this;
   },
+
+  //destroys the model
+  clear: function() {
+    this.model.clear();
+  },
+
   viewSolution: function(){
 
     //creates a matrix from a list + vector that can be

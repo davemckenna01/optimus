@@ -83,7 +83,8 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
       #Another code?
       self.response.set_status('200')
 
-  #also need to delete any solutions associated with the file
+  #also need to delete any solutions associated with the file,
+  #or else they will be orphaned in the google datastore!!!
   def delete(self, resource):
     resource = str(urllib.unquote(resource))
     blob_info = blobstore.BlobInfo.get(resource)
@@ -91,7 +92,8 @@ class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
     file_meta = FileMeta.all().filter('blob_info = ', blob_info.key()).get()
 
     #This needs to be more robust
-    file_meta.delete() and blob_info.delete()
+    file_meta.delete()
+    blob_info.delete()
     self.response.set_status('200')
 
   def get(self, resource):
@@ -138,6 +140,11 @@ class SolutionDetailHandler(webapp.RequestHandler):
     }
 
     self.response.out.write(json.dumps(j))
+
+  def delete(self, blob_key, sol_key):
+    sol_key = str(urllib.unquote(sol_key))
+    Solution.get(sol_key).delete()
+    self.response.set_status('200')
 
 
 class SolutionHandler(webapp.RequestHandler):
