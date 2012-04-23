@@ -19,6 +19,7 @@ class FileMeta(db.Model):
   blob_info = blobstore.BlobReferenceProperty()
   name = db.StringProperty(required=True)
   description = db.StringProperty()
+  creation = db.DateTimeProperty()
 
 class Solution(db.Model):
   blob_info = blobstore.BlobReferenceProperty()
@@ -51,15 +52,18 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     file_meta = FileMeta(
         blob_info = blob_info.key(),
         name = fname,
-        description = description
+        description = description,
+        creation = blob_info.creation
     )
     file_meta.put()
 
-    self.response.out.write(json.dumps({
-      'blobKey': str(file_meta.blob_info.key()),
-      'name': file_meta.name,
-      'description': file_meta.description
-    }))
+    self.redirect('/')
+
+    #self.response.out.write(json.dumps({
+    #  'blobKey': str(file_meta.blob_info.key()),
+    #  'name': file_meta.name,
+    #  'description': file_meta.description
+    #}))
 
 
 class ResourceDetailHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -120,7 +124,7 @@ class ResourceHandler(blobstore_handlers.BlobstoreUploadHandler):
     self.response.headers.add_header('Location', upload_url)
 
   def get(self):
-    all_files = FileMeta.all()
+    all_files = FileMeta.all().order('-creation')
     j = []
     for f in all_files:
       blob_key = str(f.blob_info.key())
