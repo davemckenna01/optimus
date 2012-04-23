@@ -7,7 +7,14 @@ var Solution = Backbone.Model.extend({
     blobKey:'',
     solKey:''
   },
-  idAttribute: 'solKey'
+
+  idAttribute: 'solKey',
+
+  validate: function(attrs){
+    if (attrs.consumers.length < 2){
+      return 'Enter more than one consumer';
+    }
+  }
 });
 
 var Solutions = Backbone.Collection.extend({
@@ -39,7 +46,14 @@ var File = Backbone.Model.extend({
       Backbone.Model.prototype.fetch.call(this, opts);
       this.fetched = true;
     }
+  },
+
+  validate: function(attrs){
+    if (!$.trim(attrs.name)){
+      return 'Come on, enter something!';
+    }
   }
+
 });
 
 var FileList = Backbone.Collection.extend({

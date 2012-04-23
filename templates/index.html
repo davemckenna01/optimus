@@ -84,6 +84,7 @@
     <div class="edit">
       <label for="nameField">File Name: </label>
       <input class="nameField" name="nameField" type="text" value="<%= name %>" />
+      <span class="error nameFieldError"></span>
       <br />
       <label for="descField">Description: </label>
       <input class="descField" name="descField" type="text" value="<%= description %>" />
@@ -106,8 +107,9 @@
         <option value="random">Random</option>
       </select>
       <br/>
-      <label for="consumers">Distrubute among:</label>
-      <input type="text" name="consumers" placeholder="comma, seperated, list" />
+      <label for="consumersField">Distrubute among:</label>
+      <input class="consumersField" type="text" name="consumersField" placeholder="comma, seperated, list" />
+      <span class="error consumersFieldError"></span>
       <br />
       <span class="btn">GO!</span>
     </div>

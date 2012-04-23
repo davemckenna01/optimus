@@ -27,13 +27,18 @@ var FileView = Backbone.View.extend({
       sol: false,
       opt: false
     };
+
   },
 
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
     this.$nameField = this.$el.find('.nameField');
+    this.$nameFieldError = this.$el.find('.nameFieldError');
     this.$descField = this.$el.find('.descField');
+    this.$consumersField = this.$el.find('.consumersField');
+    this.$consumersFieldError = this.$el.find('.consumersFieldError');
     this.refreshSubviews();
+
     return this;
   },
 
@@ -63,11 +68,22 @@ var FileView = Backbone.View.extend({
 
   // Close the "editing" mode, saving changes to the file
   close: function() {
-    this.model.save({
+    /////////////////////////////////////////////////
+    //this is totally not the right spot for this...
+    function handleError(model, err){
+      this.$nameFieldError.html(err);
+    }
+    handleError = _.bind(handleError, this);
+    this.model.on('error', handleError);
+    /////////////////////////////////////////////////
+
+    if (this.model.save({
       name: this.$nameField.val(),
       description: this.$descField.val()
-    });
-    this.$el.removeClass("editing");
+    })) {
+      this.$nameFieldError.html('');
+      this.$el.removeClass("editing");
+    }
   },
 
   // Remove the item, destroy the model.
@@ -108,18 +124,29 @@ var FileView = Backbone.View.extend({
 
   optimize: function(){
     function create(){
-      var sol = new Solution({
+      var sol = new Solution();
+
+      /////////////////////////////////////////////////
+      //this is totally not the right spot for this...
+      function handleError(model, err){
+        this.$consumersFieldError.html(err);
+      }
+      handleError = _.bind(handleError, this);
+      sol.on('error', handleError);
+      /////////////////////////////////////////////////
+
+      if (sol.set({
         algorithm: this.$optForm.find('select').val(),
         consumers: this.$optForm.find('input').val()
-      });
-
-      //Backbone does a PUT if there's an id on the model, 
-      //even if it's an empty string, and the way I'm
-      //initing this model it has an empty string, so
-      //need to delete it.
-      delete(sol.id);
-
-      this.solutionsModel.create(sol);
+      })){
+        this.$consumersFieldError.html('');
+        //Backbone does a PUT if there's an id on the model, 
+        //even if it's an empty string, and the way I'm
+        //initing this model it has an empty string, so
+        //need to delete it.
+        delete(sol.id);
+        this.solutionsModel.create(sol);
+      }
     }
     create = _.bind(create, this);
 
