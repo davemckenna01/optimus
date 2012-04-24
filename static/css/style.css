@@ -68,6 +68,7 @@ ul li {
   height:60px;
   margin-top:7px;
   background-size:60px;
+  text-indent:-9999px;
 }
 .navbar .brand {
   text-align:center;
@@ -84,4 +85,17 @@ ul li {
 .solution {
   background-color:#eee;
   padding:10px;
+}
+
+.solution-stats {
+  margin-bottom:10px;
+  font-style:italic;
+}
+
+.error {
+  color:red;
+}
+
+table {
+  width:100%;
 }

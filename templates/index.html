@@ -35,7 +35,7 @@
     <div class="container">
       <a class="brand" href="#">
         <!--<span>Optimus</span>-->
-        <span id="autobot"></span>
+        <span id="autobot">Optimus</span>
       </a>
       <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
         <i class="icon-upload icon-white"></i>
@@ -55,8 +55,8 @@
 
 <div class="container">
 
-  <h1>Upload files and optimize them</h1>
-  <p>Wait... what? If you have a list of resources you want to distribute <strong>evenly</strong> among 2 or<br>more "consumers", upload a file in csv, click the optimize button, choose an algorithm,<br> and enter 2 or more consumers.</p>
+  <h1>Upload stuff and optimize it</h1>
+  <p>Wait... what? More specifically, if you have a list of resources you want to distribute <strong>evenly</strong> among 2 or more "consumers", upload a file in csv format, click the optimize button, choose an algorithm, and enter 2 or more consumers. Even on data sets where ka-billions of combinations exist, this app will produce a <a href="http://en.wikipedia.org/wiki/Heuristic">heuristic</a> "solution" that is "pretty darn good" in a fraction of the time it would take to "brute-force" the best solution.</p>
 
   <div id="app">
     <div id="files" class="page">
@@ -119,7 +119,11 @@
 
 <script type="text/template" id="solution-template">
   <div class="solution">
-    <span class="item-label">Cost: <%=cost%> Algorithm: <%=algorithm%> # Consumers: <%=consumers.length%></span>
+    <span class="item-label">
+      Cost: <%=cost%>, 
+      Algorithm: <%=algorithm%>,
+      Consumers: (<%=consumers.length%>)
+    </span>
     <br>
     <a class="btn btn-primary sol-details-btn"><i class="icon-list-alt icon-white"></i> Details</a>
     <button class="btn btn-danger solution-destroy"><i class="icon-trash icon-white"></i>Delete</button>
@@ -152,7 +156,10 @@
 </script>
 
 <script type="text/template" id="solution-display-template">
-  <div>Cost: <%=data.cost%> Algorithm: <%=data.algorithm%></div>
+  <div class="solution-stats">
+    Cost: <%=data.cost%><br>
+    Algorithm: <%=data.algorithm%>
+  </div>
   <table class="table-striped table-bordered table-condensed">
     <thead>
       <tr>
@@ -174,10 +181,14 @@
 </script>
 
 <script type="text/template" id="panel-template">
-  <div class="panel">
-    <span class="close" title="Close"><i class="icon-remove"></i></span>
-    <h2></h2>
-    <div class="panel-content">
+  <div class="modal">
+    <div class="modal-header">
+      <a class="close" data-dismiss="modal">×</a>
+      <h3></h3>
+    </div>
+    <div class="modal-body">
+    </div>
+    <div class="modal-footer">
     </div>
   </div>
 </script>

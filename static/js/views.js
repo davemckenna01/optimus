@@ -250,9 +250,11 @@ var PanelView = Backbone.View.extend({
     'click .close': 'remove'
   },
   render: function(){
-    this.$el.find('h2').html(this.options.title);
-    this.$el.find('.panel-content').html(this.options.content);
-    $('body').prepend(this.el);
+    this.$el.find('.modal-header h3').html(this.options.title);
+    this.$el.find('.modal-body').html(this.options.content);
+
+    this.$el.modal();
+    //$('body').prepend(this.el);
     return this;
   }
 });
