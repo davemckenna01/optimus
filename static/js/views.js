@@ -128,7 +128,8 @@ var FileView = Backbone.View.extend({
     this.$optForm.toggle();
   },
 
-  optimize: function(){
+  optimize: function(evt){
+    console.log(arguments);
     function create(){
       var sol = new Solution();
 
@@ -141,6 +142,7 @@ var FileView = Backbone.View.extend({
       sol.on('error', handleError);
       sol.on('sync', function(model){
         model.view.viewSolution();
+        $(evt.target).button('reset');
       });
       /////////////////////////////////////////////////
 
@@ -155,6 +157,7 @@ var FileView = Backbone.View.extend({
         //need to delete it.
         delete(sol.id);
         this.solutionsModel.create(sol);
+        $(evt.target).button('loading');
       }
     }
     create = _.bind(create, this);
@@ -378,7 +381,7 @@ function SolutionListViewFactory(el, solutions, fileModel) {
         model: solution,
         fileModel: this.fileModel
       });
-      this.$el.append(view.render().el);
+      this.$el.prepend(view.render().el);
 
       //add a reference to the solution view
       //to the model...is there no way to do

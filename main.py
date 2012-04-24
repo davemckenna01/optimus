@@ -6,6 +6,7 @@ import logging
 import json
 import provision
 import csv
+from datetime import datetime
 
 from google.appengine.ext import blobstore
 from google.appengine.ext import webapp
@@ -27,6 +28,7 @@ class Solution(db.Model):
   algorithm = db.StringProperty(required=True, choices=set(['random','hillclimb','genetic','annealing']))
   vector = db.ListProperty(int,required=True)
   cost = db.IntegerProperty(required=True)
+  creation = db.DateTimeProperty()
 
 
 #URL Handlers
@@ -177,7 +179,8 @@ class SolutionHandler(webapp.RequestHandler):
       consumers = consumers.split(','),
       algorithm = algorithm,
       vector = sol_vec,
-      cost = cost
+      cost = cost,
+      creation = datetime.now()
     )
     sol.put()
 

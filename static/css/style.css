@@ -63,12 +63,13 @@ ul li {
 }
 
 #autobot {
-  background:url('../img/autobot.jpg') no-repeat;
-  width:60px;
-  height:60px;
-  margin-top:7px;
+  background:#fff url('../img/autobot.jpg') no-repeat center center;
+  width:65px;
+  height:65px;
+  margin-top:2px;
   background-size:60px;
   text-indent:-9999px;
+  border:1px solid #555;
 }
 .navbar .brand {
   text-align:center;

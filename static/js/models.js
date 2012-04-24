@@ -8,6 +8,8 @@ var Solution = Backbone.Model.extend({
     solKey:''
   },
 
+  wait: true,
+
   idAttribute: 'solKey',
 
   // Remove the item, destroy the model.
@@ -26,6 +28,7 @@ var Solutions = Backbone.Collection.extend({
   url: function(){
     return '/resources/' + this.fileId + '/solutions';
   },
+  wait: true,
   model: Solution
 });
 
