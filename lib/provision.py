@@ -1,104 +1,106 @@
 import optimization
 import pprint
 
-def optimize(resources, resource_labels, consumers, algo):
+class Provision():
 
-  consumers = [[con] for con in consumers.split(',')]
-  #append an empty list to each consumer to be filled by resources
-  for consumer in consumers:
-    consumer.append([]);
+  def __init__(self, resources, resources_labels, consumers, algo):
+    self.resources = resources
+    self.resources_labels = resources_labels
+    self.consumers = consumers
+    self.algo = algo
 
-  #What a solution looks like:
-  # [0,1,2,0,2,0,1,0,0,2,1,2,0,0,1,0,2,1,1,0,2,1,0...]
-  #where each list slot represents a particular resource
-  #from the resources list, and the value of a slot 
-  #represents the consumer that resource is assigned to
+  def optimize(self):
 
-  #What the domain looks like
-  # [(0,2),(0,2),(0,2),(0,2),(0,2),(0,2),(0,2)...]
+    self.consumers = [[con.strip()] for con in self.consumers.split(',')]
+    #append an empty list to each consumer to be filled by resources
+    for consumer in self.consumers:
+      consumer.append([]);
 
-  domain = [(0,len(consumers)-1)] * len(resources)
+    #What a solution looks like:
+    # [0,1,2,0,2,0,1,0,0,2,1,2,0,0,1,0,2,1,1,0,2,1,0...]
+    #where each list slot represents a particular resource
+    #from the resources list, and the value of a slot 
+    #represents the consumer that resource is assigned to
 
-  #This is just used for informal testing of the cost fn
-  #randomvec = [random.randint(domain[i][0],domain[i][1])
-  #             for i in range(len(domain))]
+    #What the domain looks like
+    # [(0,2),(0,2),(0,2),(0,2),(0,2),(0,2),(0,2)...]
 
-  #Add up the total strength for each attribute possessed by a resource
-  total_attr_strengths = []
-  for a in range(0, len(resources[0]) - 1):
-    total_attr_strengths.append(sum([r[a+1] for r in resources]))
-  #print 'total combined attr strength:', total_attr_strengths
+    domain = [(0,len(self.consumers)-1)] * len(self.resources)
 
-  #Ideal attribute strength at each consumer.
-  #This is simple right now becuase we're just dividing total
-  #strengths by # of consumers.
-  optimal_attr_strengths = []
-  for a in range(0, len(total_attr_strengths)):
-    optimal_attr_strengths.append(total_attr_strengths[a]/len(consumers))
-  #print 'optimal strength at each consumer:', optimal_attr_strengths
+    #Add up the total strength for each attribute possessed by a resource
+    total_attr_strengths = []
+    for a in range(0, len(self.resources[0]) - 1):
+      total_attr_strengths.append(sum([r[a+1] for r in self.resources]))
 
-  if algo == 'annealing':
-    cost, sol = optimization.annealingoptimize(domain, provisioning_cost)
-  elif algo == 'hillclimb':
-    cost, sol = optimization.hillclimb(domain, provisioning_cost)
-  elif algo == 'random':
-    cost, sol = optimization.randomoptimize(domain, provisioning_cost)
-  elif algo == 'genetic':
-    cost, sol = optimization.geneticoptimize(domain, provisioning_cost)
-  else:
-    raise ValueError('Invalid algorithm')
+    #Ideal attribute strength at each consumer.
+    #This is simple right now becuase we're just dividing total
+    #strengths by # of consumers.
+    self.optimal_attr_strengths = []
+    for a in range(0, len(total_attr_strengths)):
+      self.optimal_attr_strengths.append(total_attr_strengths[a]/len(self.consumers))
 
-  return {'cost': cost, 'solution': sol}
+    if self.algo == 'annealing':
+      cost, sol = optimization.annealingoptimize(domain, self.provisioning_cost)
+    elif self.algo == 'hillclimb':
+      cost, sol = optimization.hillclimb(domain, self.provisioning_cost)
+    elif self.algo == 'random':
+      cost, sol = optimization.randomoptimize(domain, self.provisioning_cost)
+    elif self.algo == 'genetic':
+      cost, sol = optimization.geneticoptimize(domain, self.provisioning_cost)
+    else:
+      raise ValueError('Invalid algorithm')
 
-def provisioning_cost(vec):
-  cost = 0
+    return cost, sol
 
-  #Make sure consumers are empty
-  for c in range(len(consumers)):
-    consumers[c][len(consumers[0])-1] = []
+  def provisioning_cost(self, vec):
+    cost = 0
 
-  #Add resources to the consumers based on the solution vector passed in
-  for r in range(len(vec)):
-    consumers[vec[r]][len(consumers[0])-1].append(r)
+    #Make sure consumers are empty
+    for c in range(len(self.consumers)):
+      self.consumers[c][len(self.consumers[0])-1] = []
 
-  #Loop through the consumers and determine how strength was 
-  #distributed and calculate cost
-  for c in range(len(consumers)):
-    consumer_resources = [resources[res] for res in consumers[c][len(consumers[0])-1]]
+    #Add resources to the consumers based on the solution vector passed in
+    for r in range(len(vec)):
+      self.consumers[vec[r]][len(self.consumers[0])-1].append(r)
 
-    #Add up all the strength of the resources in the consumer
-    solution_attr_strengths = []
-    for a in range(0, len(resources[0]) - 1):
-      solution_attr_strengths.append(sum([cr[a+1] for cr in consumer_resources]))
+    #Loop through the consumers and determine how strength was 
+    #distributed and calculate cost
+    for c in range(len(self.consumers)):
+      consumer_resources = [self.resources[res] for res in self.consumers[c][len(self.consumers[0])-1]]
 
-    #Normalize the number to be always non-negative: abs(). B/C whether 
-    #the solution over or under supplies the consumer is irrelevant
-    for a in range(0, len(solution_attr_strengths)):
-      cost += abs(optimal_attr_strengths[a] - solution_attr_strengths[a])
+      #Add up all the strength of the resources in the consumer
+      solution_attr_strengths = []
+      for a in range(0, len(self.resources[0]) - 1):
+        solution_attr_strengths.append(sum([cr[a+1] for cr in consumer_resources]))
 
-  return cost
+      #Normalize the number to be always non-negative: abs(). B/C whether 
+      #the solution over or under supplies the consumer is irrelevant
+      for a in range(0, len(solution_attr_strengths)):
+        cost += abs(self.optimal_attr_strengths[a] - solution_attr_strengths[a])
 
-#Print out a solution (w/ names of resources and consumers, etc)
-def print_solution(vec):
+    return cost
 
-  #Make sure consumers are empty
-  for c in range(len(consumers)):
-    consumers[c][len(consumers[0])-1] = []
+  #Print out a solution (w/ names of resources and consumers, etc)
+  def print_solution(self, vec):
 
-  #Add resources to the consumer
-  for r in range(len(vec)):
-    consumers[vec[r]][len(consumers[0])-1].append(r)
+    #Make sure consumers are empty
+    for c in range(len(self.consumers)):
+      self.consumers[c][len(self.consumers[0])-1] = []
 
-  #Pretty print the solution
-  for consumer in consumers:
-    print "=== Consumer: %s ===" % consumer[0] #the consumer "name"
-    for res in consumer[len(consumers[0])-1]:
+    #Add resources to the consumer
+    for r in range(len(vec)):
+      self.consumers[vec[r]][len(self.consumers[0])-1].append(r)
 
-      for d in range(0, len(resources[0])):
-        print "%20s: %s" % (resources_labels[d], resources[res][d])
+    #Pretty print the solution
+    for consumer in self.consumers:
+      print "=== Consumer: %s ===" % consumer[0] #the consumer "name"
+      for res in consumer[len(self.consumers[0])-1]:
 
-    for a in range(0, len(resources[0]) - 1):
-      total = sum([resources[r][a+1] for r in consumer[len(consumers[0])-1]])
-      print "%s strength at %s: %s" % (resources_labels[a+1], consumer[0], total)
+        for d in range(0, len(self.resources[0])):
+          print "%20s: %s" % (self.resources_labels[d], self.resources[res][d])
+
+      for a in range(0, len(self.resources[0]) - 1):
+        total = sum([self.resources[r][a+1] for r in consumer[len(self.consumers[0])-1]])
+        print "%s strength at %s: %s" % (self.resources_labels[a+1], consumer[0], total)
 
 
